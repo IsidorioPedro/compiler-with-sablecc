@@ -69,7 +69,67 @@ public class AnalysisAdapter implements Analysis
     }
 
     @Override
-    public void caseTSuplementar(TSuplementar node)
+    public void caseStart(Start node)
+    {
+        defaultCase(node);
+    }
+
+    @Override
+    public void caseAFatorExpr(AFatorExpr node)
+    {
+        defaultCase(node);
+    }
+
+    @Override
+    public void caseASomaExpr(ASomaExpr node)
+    {
+        defaultCase(node);
+    }
+
+    @Override
+    public void caseAMenosExpr(AMenosExpr node)
+    {
+        defaultCase(node);
+    }
+
+    @Override
+    public void caseATermoFator(ATermoFator node)
+    {
+        defaultCase(node);
+    }
+
+    @Override
+    public void caseAMultiplicaFator(AMultiplicaFator node)
+    {
+        defaultCase(node);
+    }
+
+    @Override
+    public void caseADivFator(ADivFator node)
+    {
+        defaultCase(node);
+    }
+
+    @Override
+    public void caseAModFator(AModFator node)
+    {
+        defaultCase(node);
+    }
+
+    @Override
+    public void caseANumeroTermo(ANumeroTermo node)
+    {
+        defaultCase(node);
+    }
+
+    @Override
+    public void caseAParTermo(AParTermo node)
+    {
+        defaultCase(node);
+    }
+
+    @Override
+    public void caseTVacuo(TVacuo node)
     {
         defaultCase(node);
     }
@@ -238,6 +298,12 @@ public class AnalysisAdapter implements Analysis
 
     @Override
     public void caseTMultiplicacao(TMultiplicacao node)
+    {
+        defaultCase(node);
+    }
+
+    @Override
+    public void caseTMod(TMod node)
     {
         defaultCase(node);
     }

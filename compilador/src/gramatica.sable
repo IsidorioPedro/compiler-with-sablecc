@@ -65,6 +65,7 @@ Tokens
     menos = '-';
     divisao = '/';
     multiplicacao = '*';
+    mod = '%';
     
     igual = '=';
     maior = '>';
@@ -98,7 +99,25 @@ Tokens
 
     vetor = vetor_caractere | vetor_unidimensional | vetor_multidimensional;
     */
+
 Ignored Tokens
     comentario,
     vacuo;
 
+Productions
+
+
+ expr =
+   {fator} fator 
+  |{soma} expr soma fator 
+  |{menos} expr menos fator;
+
+ fator =
+   {termo} termo 
+  |{multiplica} fator multiplicacao termo 
+  |{div} fator divisao termo 
+  |{mod} fator mod termo;
+  
+ termo =
+   {numero} numero 
+  |{par} abre_parentese expr fecha_parentese;
