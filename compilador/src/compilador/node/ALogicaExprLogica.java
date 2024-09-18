@@ -5,26 +5,26 @@ package compilador.node;
 import compilador.analysis.*;
 
 @SuppressWarnings("nls")
-public final class AMultiplicaFator extends PFator
+public final class ALogicaExprLogica extends PExprLogica
 {
-    private PFator _fator_;
-    private TMultiplicacao _multiplicacao_;
+    private PExprLogica _exprLogica_;
+    private POpLogica _opLogica_;
     private PTermo _termo_;
 
-    public AMultiplicaFator()
+    public ALogicaExprLogica()
     {
         // Constructor
     }
 
-    public AMultiplicaFator(
-        @SuppressWarnings("hiding") PFator _fator_,
-        @SuppressWarnings("hiding") TMultiplicacao _multiplicacao_,
+    public ALogicaExprLogica(
+        @SuppressWarnings("hiding") PExprLogica _exprLogica_,
+        @SuppressWarnings("hiding") POpLogica _opLogica_,
         @SuppressWarnings("hiding") PTermo _termo_)
     {
         // Constructor
-        setFator(_fator_);
+        setExprLogica(_exprLogica_);
 
-        setMultiplicacao(_multiplicacao_);
+        setOpLogica(_opLogica_);
 
         setTermo(_termo_);
 
@@ -33,28 +33,28 @@ public final class AMultiplicaFator extends PFator
     @Override
     public Object clone()
     {
-        return new AMultiplicaFator(
-            cloneNode(this._fator_),
-            cloneNode(this._multiplicacao_),
+        return new ALogicaExprLogica(
+            cloneNode(this._exprLogica_),
+            cloneNode(this._opLogica_),
             cloneNode(this._termo_));
     }
 
     @Override
     public void apply(Switch sw)
     {
-        ((Analysis) sw).caseAMultiplicaFator(this);
+        ((Analysis) sw).caseALogicaExprLogica(this);
     }
 
-    public PFator getFator()
+    public PExprLogica getExprLogica()
     {
-        return this._fator_;
+        return this._exprLogica_;
     }
 
-    public void setFator(PFator node)
+    public void setExprLogica(PExprLogica node)
     {
-        if(this._fator_ != null)
+        if(this._exprLogica_ != null)
         {
-            this._fator_.parent(null);
+            this._exprLogica_.parent(null);
         }
 
         if(node != null)
@@ -67,19 +67,19 @@ public final class AMultiplicaFator extends PFator
             node.parent(this);
         }
 
-        this._fator_ = node;
+        this._exprLogica_ = node;
     }
 
-    public TMultiplicacao getMultiplicacao()
+    public POpLogica getOpLogica()
     {
-        return this._multiplicacao_;
+        return this._opLogica_;
     }
 
-    public void setMultiplicacao(TMultiplicacao node)
+    public void setOpLogica(POpLogica node)
     {
-        if(this._multiplicacao_ != null)
+        if(this._opLogica_ != null)
         {
-            this._multiplicacao_.parent(null);
+            this._opLogica_.parent(null);
         }
 
         if(node != null)
@@ -92,7 +92,7 @@ public final class AMultiplicaFator extends PFator
             node.parent(this);
         }
 
-        this._multiplicacao_ = node;
+        this._opLogica_ = node;
     }
 
     public PTermo getTermo()
@@ -124,8 +124,8 @@ public final class AMultiplicaFator extends PFator
     public String toString()
     {
         return ""
-            + toString(this._fator_)
-            + toString(this._multiplicacao_)
+            + toString(this._exprLogica_)
+            + toString(this._opLogica_)
             + toString(this._termo_);
     }
 
@@ -133,15 +133,15 @@ public final class AMultiplicaFator extends PFator
     void removeChild(@SuppressWarnings("unused") Node child)
     {
         // Remove child
-        if(this._fator_ == child)
+        if(this._exprLogica_ == child)
         {
-            this._fator_ = null;
+            this._exprLogica_ = null;
             return;
         }
 
-        if(this._multiplicacao_ == child)
+        if(this._opLogica_ == child)
         {
-            this._multiplicacao_ = null;
+            this._opLogica_ = null;
             return;
         }
 
@@ -158,15 +158,15 @@ public final class AMultiplicaFator extends PFator
     void replaceChild(@SuppressWarnings("unused") Node oldChild, @SuppressWarnings("unused") Node newChild)
     {
         // Replace child
-        if(this._fator_ == oldChild)
+        if(this._exprLogica_ == oldChild)
         {
-            setFator((PFator) newChild);
+            setExprLogica((PExprLogica) newChild);
             return;
         }
 
-        if(this._multiplicacao_ == oldChild)
+        if(this._opLogica_ == oldChild)
         {
-            setMultiplicacao((TMultiplicacao) newChild);
+            setOpLogica((POpLogica) newChild);
             return;
         }
 
