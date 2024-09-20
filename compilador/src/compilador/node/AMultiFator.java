@@ -5,26 +5,26 @@ package compilador.node;
 import compilador.analysis.*;
 
 @SuppressWarnings("nls")
-public final class AModFator extends PFator
+public final class AMultiFator extends PFator
 {
     private PFator _fator_;
-    private TMod _mod_;
+    private TMultiplicacao _multiplicacao_;
     private PExprComparacao _exprComparacao_;
 
-    public AModFator()
+    public AMultiFator()
     {
         // Constructor
     }
 
-    public AModFator(
+    public AMultiFator(
         @SuppressWarnings("hiding") PFator _fator_,
-        @SuppressWarnings("hiding") TMod _mod_,
+        @SuppressWarnings("hiding") TMultiplicacao _multiplicacao_,
         @SuppressWarnings("hiding") PExprComparacao _exprComparacao_)
     {
         // Constructor
         setFator(_fator_);
 
-        setMod(_mod_);
+        setMultiplicacao(_multiplicacao_);
 
         setExprComparacao(_exprComparacao_);
 
@@ -33,16 +33,16 @@ public final class AModFator extends PFator
     @Override
     public Object clone()
     {
-        return new AModFator(
+        return new AMultiFator(
             cloneNode(this._fator_),
-            cloneNode(this._mod_),
+            cloneNode(this._multiplicacao_),
             cloneNode(this._exprComparacao_));
     }
 
     @Override
     public void apply(Switch sw)
     {
-        ((Analysis) sw).caseAModFator(this);
+        ((Analysis) sw).caseAMultiFator(this);
     }
 
     public PFator getFator()
@@ -70,16 +70,16 @@ public final class AModFator extends PFator
         this._fator_ = node;
     }
 
-    public TMod getMod()
+    public TMultiplicacao getMultiplicacao()
     {
-        return this._mod_;
+        return this._multiplicacao_;
     }
 
-    public void setMod(TMod node)
+    public void setMultiplicacao(TMultiplicacao node)
     {
-        if(this._mod_ != null)
+        if(this._multiplicacao_ != null)
         {
-            this._mod_.parent(null);
+            this._multiplicacao_.parent(null);
         }
 
         if(node != null)
@@ -92,7 +92,7 @@ public final class AModFator extends PFator
             node.parent(this);
         }
 
-        this._mod_ = node;
+        this._multiplicacao_ = node;
     }
 
     public PExprComparacao getExprComparacao()
@@ -125,7 +125,7 @@ public final class AModFator extends PFator
     {
         return ""
             + toString(this._fator_)
-            + toString(this._mod_)
+            + toString(this._multiplicacao_)
             + toString(this._exprComparacao_);
     }
 
@@ -139,9 +139,9 @@ public final class AModFator extends PFator
             return;
         }
 
-        if(this._mod_ == child)
+        if(this._multiplicacao_ == child)
         {
-            this._mod_ = null;
+            this._multiplicacao_ = null;
             return;
         }
 
@@ -164,9 +164,9 @@ public final class AModFator extends PFator
             return;
         }
 
-        if(this._mod_ == oldChild)
+        if(this._multiplicacao_ == oldChild)
         {
-            setMod((TMod) newChild);
+            setMultiplicacao((TMultiplicacao) newChild);
             return;
         }
 

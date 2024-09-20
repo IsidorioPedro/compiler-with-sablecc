@@ -106,18 +106,63 @@ Ignored Tokens
 
 Productions
 
-
+ /* Expressão aritmetica */
  expr =
    {fator} fator 
   |{soma} expr soma fator 
   |{menos} expr menos fator;
 
+ /* Efeito cascata da expressão aritmetica */
  fator =
-   {termo} termo 
-  |{multiplica} fator multiplicacao termo 
-  |{div} fator divisao termo 
-  |{mod} fator mod termo;
-  
+   {compara} expr_comparacao
+  |{multi} fator multiplicacao expr_comparacao 
+  |{div} fator divisao expr_comparacao 
+  |{mod} fator mod expr_comparacao;
+ 
+ /* Expressão Comparação */ 
+ expr_comparacao = 
+   {logica} expr_logica
+  |{comparacao} expr_comparacao op_comp expr_logica;
+ 
+ /* Expressão Logica */
+ expr_logica =
+   {termo} termo
+  |{logica} expr_logica op_logica termo
+  |{neglogica} nao termo;
+ 
+ /* Estado Terminal das expressões */
  termo =
-   {numero} numero 
+   {caractere} caractere
+  |{numero} numero 
+  |{booleano} booleano
+  |{var} var
+  |{chamada} chamada
   |{par} abre_parentese expr fecha_parentese;
+ 
+ /* Variavel */
+ var =
+   {id} id
+  |{vetor} var abre_colchete expr fecha_colchete;
+ 
+ /* Chamada de função */
+ chamada =
+   {funcao} id abre_parentese lista_expr fecha_parentese;
+ 
+ /* Lista de expressões para a função */
+ lista_expr = 
+   {vazio}
+  |{expressao} expr
+  |{expressaomais} barra_reta expr;
+ 
+ /* Operadores de Comparação */
+ op_comp =
+ 	{menorque} menor
+   |{maiorque} maior
+   |{maiorigual} maior_igual
+   |{menorigual} menor_igual
+   |{igualdade} igual;
+ 
+ /* Operadores de Logica */
+ op_logica =
+    {ou} ou
+   |{e} e;

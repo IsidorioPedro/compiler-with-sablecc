@@ -9,7 +9,7 @@ public final class ADivFator extends PFator
 {
     private PFator _fator_;
     private TDivisao _divisao_;
-    private PTermo _termo_;
+    private PExprComparacao _exprComparacao_;
 
     public ADivFator()
     {
@@ -19,14 +19,14 @@ public final class ADivFator extends PFator
     public ADivFator(
         @SuppressWarnings("hiding") PFator _fator_,
         @SuppressWarnings("hiding") TDivisao _divisao_,
-        @SuppressWarnings("hiding") PTermo _termo_)
+        @SuppressWarnings("hiding") PExprComparacao _exprComparacao_)
     {
         // Constructor
         setFator(_fator_);
 
         setDivisao(_divisao_);
 
-        setTermo(_termo_);
+        setExprComparacao(_exprComparacao_);
 
     }
 
@@ -36,7 +36,7 @@ public final class ADivFator extends PFator
         return new ADivFator(
             cloneNode(this._fator_),
             cloneNode(this._divisao_),
-            cloneNode(this._termo_));
+            cloneNode(this._exprComparacao_));
     }
 
     @Override
@@ -95,16 +95,16 @@ public final class ADivFator extends PFator
         this._divisao_ = node;
     }
 
-    public PTermo getTermo()
+    public PExprComparacao getExprComparacao()
     {
-        return this._termo_;
+        return this._exprComparacao_;
     }
 
-    public void setTermo(PTermo node)
+    public void setExprComparacao(PExprComparacao node)
     {
-        if(this._termo_ != null)
+        if(this._exprComparacao_ != null)
         {
-            this._termo_.parent(null);
+            this._exprComparacao_.parent(null);
         }
 
         if(node != null)
@@ -117,7 +117,7 @@ public final class ADivFator extends PFator
             node.parent(this);
         }
 
-        this._termo_ = node;
+        this._exprComparacao_ = node;
     }
 
     @Override
@@ -126,7 +126,7 @@ public final class ADivFator extends PFator
         return ""
             + toString(this._fator_)
             + toString(this._divisao_)
-            + toString(this._termo_);
+            + toString(this._exprComparacao_);
     }
 
     @Override
@@ -145,9 +145,9 @@ public final class ADivFator extends PFator
             return;
         }
 
-        if(this._termo_ == child)
+        if(this._exprComparacao_ == child)
         {
-            this._termo_ = null;
+            this._exprComparacao_ = null;
             return;
         }
 
@@ -170,9 +170,9 @@ public final class ADivFator extends PFator
             return;
         }
 
-        if(this._termo_ == oldChild)
+        if(this._exprComparacao_ == oldChild)
         {
-            setTermo((PTermo) newChild);
+            setExprComparacao((PExprComparacao) newChild);
             return;
         }
 

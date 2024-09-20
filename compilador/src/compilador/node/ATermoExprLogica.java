@@ -5,16 +5,16 @@ package compilador.node;
 import compilador.analysis.*;
 
 @SuppressWarnings("nls")
-public final class ATermoFator extends PFator
+public final class ATermoExprLogica extends PExprLogica
 {
     private PTermo _termo_;
 
-    public ATermoFator()
+    public ATermoExprLogica()
     {
         // Constructor
     }
 
-    public ATermoFator(
+    public ATermoExprLogica(
         @SuppressWarnings("hiding") PTermo _termo_)
     {
         // Constructor
@@ -25,14 +25,14 @@ public final class ATermoFator extends PFator
     @Override
     public Object clone()
     {
-        return new ATermoFator(
+        return new ATermoExprLogica(
             cloneNode(this._termo_));
     }
 
     @Override
     public void apply(Switch sw)
     {
-        ((Analysis) sw).caseATermoFator(this);
+        ((Analysis) sw).caseATermoExprLogica(this);
     }
 
     public PTermo getTermo()
