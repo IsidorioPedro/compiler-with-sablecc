@@ -1,1 +1,1 @@
-6+5*1
+numero gamba, veloz, ns.

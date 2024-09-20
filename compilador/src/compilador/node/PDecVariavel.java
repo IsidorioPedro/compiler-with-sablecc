@@ -2,7 +2,7 @@
 
 package compilador.node;
 
-public abstract class PExprComparacao extends Node
+public abstract class PDecVariavel extends Node
 {
     // Empty body
 }

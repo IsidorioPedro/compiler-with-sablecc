@@ -5,24 +5,24 @@ package compilador.node;
 import compilador.analysis.*;
 
 @SuppressWarnings("nls")
-public final class AComparacaoExprComparacao extends PExprComparacao
+public final class AComparacaoExprRelacional extends PExprRelacional
 {
-    private PExprComparacao _exprComparacao_;
+    private PExprRelacional _exprRelacional_;
     private POpComp _opComp_;
     private PExprLogica _exprLogica_;
 
-    public AComparacaoExprComparacao()
+    public AComparacaoExprRelacional()
     {
         // Constructor
     }
 
-    public AComparacaoExprComparacao(
-        @SuppressWarnings("hiding") PExprComparacao _exprComparacao_,
+    public AComparacaoExprRelacional(
+        @SuppressWarnings("hiding") PExprRelacional _exprRelacional_,
         @SuppressWarnings("hiding") POpComp _opComp_,
         @SuppressWarnings("hiding") PExprLogica _exprLogica_)
     {
         // Constructor
-        setExprComparacao(_exprComparacao_);
+        setExprRelacional(_exprRelacional_);
 
         setOpComp(_opComp_);
 
@@ -33,8 +33,8 @@ public final class AComparacaoExprComparacao extends PExprComparacao
     @Override
     public Object clone()
     {
-        return new AComparacaoExprComparacao(
-            cloneNode(this._exprComparacao_),
+        return new AComparacaoExprRelacional(
+            cloneNode(this._exprRelacional_),
             cloneNode(this._opComp_),
             cloneNode(this._exprLogica_));
     }
@@ -42,19 +42,19 @@ public final class AComparacaoExprComparacao extends PExprComparacao
     @Override
     public void apply(Switch sw)
     {
-        ((Analysis) sw).caseAComparacaoExprComparacao(this);
+        ((Analysis) sw).caseAComparacaoExprRelacional(this);
     }
 
-    public PExprComparacao getExprComparacao()
+    public PExprRelacional getExprRelacional()
     {
-        return this._exprComparacao_;
+        return this._exprRelacional_;
     }
 
-    public void setExprComparacao(PExprComparacao node)
+    public void setExprRelacional(PExprRelacional node)
     {
-        if(this._exprComparacao_ != null)
+        if(this._exprRelacional_ != null)
         {
-            this._exprComparacao_.parent(null);
+            this._exprRelacional_.parent(null);
         }
 
         if(node != null)
@@ -67,7 +67,7 @@ public final class AComparacaoExprComparacao extends PExprComparacao
             node.parent(this);
         }
 
-        this._exprComparacao_ = node;
+        this._exprRelacional_ = node;
     }
 
     public POpComp getOpComp()
@@ -124,7 +124,7 @@ public final class AComparacaoExprComparacao extends PExprComparacao
     public String toString()
     {
         return ""
-            + toString(this._exprComparacao_)
+            + toString(this._exprRelacional_)
             + toString(this._opComp_)
             + toString(this._exprLogica_);
     }
@@ -133,9 +133,9 @@ public final class AComparacaoExprComparacao extends PExprComparacao
     void removeChild(@SuppressWarnings("unused") Node child)
     {
         // Remove child
-        if(this._exprComparacao_ == child)
+        if(this._exprRelacional_ == child)
         {
-            this._exprComparacao_ = null;
+            this._exprRelacional_ = null;
             return;
         }
 
@@ -158,9 +158,9 @@ public final class AComparacaoExprComparacao extends PExprComparacao
     void replaceChild(@SuppressWarnings("unused") Node oldChild, @SuppressWarnings("unused") Node newChild)
     {
         // Replace child
-        if(this._exprComparacao_ == oldChild)
+        if(this._exprRelacional_ == oldChild)
         {
-            setExprComparacao((PExprComparacao) newChild);
+            setExprRelacional((PExprRelacional) newChild);
             return;
         }
 
