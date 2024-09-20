@@ -5,46 +5,46 @@ package compilador.node;
 import compilador.analysis.*;
 
 @SuppressWarnings("nls")
-public final class AComparaFator extends PFator
+public final class AParamParametros extends PParametros
 {
-    private PExprComparacao _exprComparacao_;
+    private PParametro _parametro_;
 
-    public AComparaFator()
+    public AParamParametros()
     {
         // Constructor
     }
 
-    public AComparaFator(
-        @SuppressWarnings("hiding") PExprComparacao _exprComparacao_)
+    public AParamParametros(
+        @SuppressWarnings("hiding") PParametro _parametro_)
     {
         // Constructor
-        setExprComparacao(_exprComparacao_);
+        setParametro(_parametro_);
 
     }
 
     @Override
     public Object clone()
     {
-        return new AComparaFator(
-            cloneNode(this._exprComparacao_));
+        return new AParamParametros(
+            cloneNode(this._parametro_));
     }
 
     @Override
     public void apply(Switch sw)
     {
-        ((Analysis) sw).caseAComparaFator(this);
+        ((Analysis) sw).caseAParamParametros(this);
     }
 
-    public PExprComparacao getExprComparacao()
+    public PParametro getParametro()
     {
-        return this._exprComparacao_;
+        return this._parametro_;
     }
 
-    public void setExprComparacao(PExprComparacao node)
+    public void setParametro(PParametro node)
     {
-        if(this._exprComparacao_ != null)
+        if(this._parametro_ != null)
         {
-            this._exprComparacao_.parent(null);
+            this._parametro_.parent(null);
         }
 
         if(node != null)
@@ -57,23 +57,23 @@ public final class AComparaFator extends PFator
             node.parent(this);
         }
 
-        this._exprComparacao_ = node;
+        this._parametro_ = node;
     }
 
     @Override
     public String toString()
     {
         return ""
-            + toString(this._exprComparacao_);
+            + toString(this._parametro_);
     }
 
     @Override
     void removeChild(@SuppressWarnings("unused") Node child)
     {
         // Remove child
-        if(this._exprComparacao_ == child)
+        if(this._parametro_ == child)
         {
-            this._exprComparacao_ = null;
+            this._parametro_ = null;
             return;
         }
 
@@ -84,9 +84,9 @@ public final class AComparaFator extends PFator
     void replaceChild(@SuppressWarnings("unused") Node oldChild, @SuppressWarnings("unused") Node newChild)
     {
         // Replace child
-        if(this._exprComparacao_ == oldChild)
+        if(this._parametro_ == oldChild)
         {
-            setExprComparacao((PExprComparacao) newChild);
+            setParametro((PParametro) newChild);
             return;
         }
 

@@ -7,8 +7,9 @@ import compilador.analysis.*;
 @SuppressWarnings("nls")
 public final class AExpressaomaisListaExpr extends PListaExpr
 {
-    private TBarraReta _barraReta_;
     private PExpr _expr_;
+    private TBarraReta _barraReta_;
+    private PListaExpr _listaExpr_;
 
     public AExpressaomaisListaExpr()
     {
@@ -16,13 +17,16 @@ public final class AExpressaomaisListaExpr extends PListaExpr
     }
 
     public AExpressaomaisListaExpr(
+        @SuppressWarnings("hiding") PExpr _expr_,
         @SuppressWarnings("hiding") TBarraReta _barraReta_,
-        @SuppressWarnings("hiding") PExpr _expr_)
+        @SuppressWarnings("hiding") PListaExpr _listaExpr_)
     {
         // Constructor
+        setExpr(_expr_);
+
         setBarraReta(_barraReta_);
 
-        setExpr(_expr_);
+        setListaExpr(_listaExpr_);
 
     }
 
@@ -30,39 +34,15 @@ public final class AExpressaomaisListaExpr extends PListaExpr
     public Object clone()
     {
         return new AExpressaomaisListaExpr(
+            cloneNode(this._expr_),
             cloneNode(this._barraReta_),
-            cloneNode(this._expr_));
+            cloneNode(this._listaExpr_));
     }
 
     @Override
     public void apply(Switch sw)
     {
         ((Analysis) sw).caseAExpressaomaisListaExpr(this);
-    }
-
-    public TBarraReta getBarraReta()
-    {
-        return this._barraReta_;
-    }
-
-    public void setBarraReta(TBarraReta node)
-    {
-        if(this._barraReta_ != null)
-        {
-            this._barraReta_.parent(null);
-        }
-
-        if(node != null)
-        {
-            if(node.parent() != null)
-            {
-                node.parent().removeChild(node);
-            }
-
-            node.parent(this);
-        }
-
-        this._barraReta_ = node;
     }
 
     public PExpr getExpr()
@@ -90,27 +70,84 @@ public final class AExpressaomaisListaExpr extends PListaExpr
         this._expr_ = node;
     }
 
+    public TBarraReta getBarraReta()
+    {
+        return this._barraReta_;
+    }
+
+    public void setBarraReta(TBarraReta node)
+    {
+        if(this._barraReta_ != null)
+        {
+            this._barraReta_.parent(null);
+        }
+
+        if(node != null)
+        {
+            if(node.parent() != null)
+            {
+                node.parent().removeChild(node);
+            }
+
+            node.parent(this);
+        }
+
+        this._barraReta_ = node;
+    }
+
+    public PListaExpr getListaExpr()
+    {
+        return this._listaExpr_;
+    }
+
+    public void setListaExpr(PListaExpr node)
+    {
+        if(this._listaExpr_ != null)
+        {
+            this._listaExpr_.parent(null);
+        }
+
+        if(node != null)
+        {
+            if(node.parent() != null)
+            {
+                node.parent().removeChild(node);
+            }
+
+            node.parent(this);
+        }
+
+        this._listaExpr_ = node;
+    }
+
     @Override
     public String toString()
     {
         return ""
+            + toString(this._expr_)
             + toString(this._barraReta_)
-            + toString(this._expr_);
+            + toString(this._listaExpr_);
     }
 
     @Override
     void removeChild(@SuppressWarnings("unused") Node child)
     {
         // Remove child
+        if(this._expr_ == child)
+        {
+            this._expr_ = null;
+            return;
+        }
+
         if(this._barraReta_ == child)
         {
             this._barraReta_ = null;
             return;
         }
 
-        if(this._expr_ == child)
+        if(this._listaExpr_ == child)
         {
-            this._expr_ = null;
+            this._listaExpr_ = null;
             return;
         }
 
@@ -121,15 +158,21 @@ public final class AExpressaomaisListaExpr extends PListaExpr
     void replaceChild(@SuppressWarnings("unused") Node oldChild, @SuppressWarnings("unused") Node newChild)
     {
         // Replace child
+        if(this._expr_ == oldChild)
+        {
+            setExpr((PExpr) newChild);
+            return;
+        }
+
         if(this._barraReta_ == oldChild)
         {
             setBarraReta((TBarraReta) newChild);
             return;
         }
 
-        if(this._expr_ == oldChild)
+        if(this._listaExpr_ == oldChild)
         {
-            setExpr((PExpr) newChild);
+            setListaExpr((PListaExpr) newChild);
             return;
         }
 

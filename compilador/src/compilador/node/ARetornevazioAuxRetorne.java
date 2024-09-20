@@ -5,46 +5,46 @@ package compilador.node;
 import compilador.analysis.*;
 
 @SuppressWarnings("nls")
-public final class ALogicaExprComparacao extends PExprComparacao
+public final class ARetornevazioAuxRetorne extends PAuxRetorne
 {
-    private PExprLogica _exprLogica_;
+    private TRetorne _retorne_;
 
-    public ALogicaExprComparacao()
+    public ARetornevazioAuxRetorne()
     {
         // Constructor
     }
 
-    public ALogicaExprComparacao(
-        @SuppressWarnings("hiding") PExprLogica _exprLogica_)
+    public ARetornevazioAuxRetorne(
+        @SuppressWarnings("hiding") TRetorne _retorne_)
     {
         // Constructor
-        setExprLogica(_exprLogica_);
+        setRetorne(_retorne_);
 
     }
 
     @Override
     public Object clone()
     {
-        return new ALogicaExprComparacao(
-            cloneNode(this._exprLogica_));
+        return new ARetornevazioAuxRetorne(
+            cloneNode(this._retorne_));
     }
 
     @Override
     public void apply(Switch sw)
     {
-        ((Analysis) sw).caseALogicaExprComparacao(this);
+        ((Analysis) sw).caseARetornevazioAuxRetorne(this);
     }
 
-    public PExprLogica getExprLogica()
+    public TRetorne getRetorne()
     {
-        return this._exprLogica_;
+        return this._retorne_;
     }
 
-    public void setExprLogica(PExprLogica node)
+    public void setRetorne(TRetorne node)
     {
-        if(this._exprLogica_ != null)
+        if(this._retorne_ != null)
         {
-            this._exprLogica_.parent(null);
+            this._retorne_.parent(null);
         }
 
         if(node != null)
@@ -57,23 +57,23 @@ public final class ALogicaExprComparacao extends PExprComparacao
             node.parent(this);
         }
 
-        this._exprLogica_ = node;
+        this._retorne_ = node;
     }
 
     @Override
     public String toString()
     {
         return ""
-            + toString(this._exprLogica_);
+            + toString(this._retorne_);
     }
 
     @Override
     void removeChild(@SuppressWarnings("unused") Node child)
     {
         // Remove child
-        if(this._exprLogica_ == child)
+        if(this._retorne_ == child)
         {
-            this._exprLogica_ = null;
+            this._retorne_ = null;
             return;
         }
 
@@ -84,9 +84,9 @@ public final class ALogicaExprComparacao extends PExprComparacao
     void replaceChild(@SuppressWarnings("unused") Node oldChild, @SuppressWarnings("unused") Node newChild)
     {
         // Replace child
-        if(this._exprLogica_ == oldChild)
+        if(this._retorne_ == oldChild)
         {
-            setExprLogica((PExprLogica) newChild);
+            setRetorne((TRetorne) newChild);
             return;
         }
 

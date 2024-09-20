@@ -9,7 +9,7 @@ public final class AMultiFator extends PFator
 {
     private PFator _fator_;
     private TMultiplicacao _multiplicacao_;
-    private PExprComparacao _exprComparacao_;
+    private PExprRelacional _exprRelacional_;
 
     public AMultiFator()
     {
@@ -19,14 +19,14 @@ public final class AMultiFator extends PFator
     public AMultiFator(
         @SuppressWarnings("hiding") PFator _fator_,
         @SuppressWarnings("hiding") TMultiplicacao _multiplicacao_,
-        @SuppressWarnings("hiding") PExprComparacao _exprComparacao_)
+        @SuppressWarnings("hiding") PExprRelacional _exprRelacional_)
     {
         // Constructor
         setFator(_fator_);
 
         setMultiplicacao(_multiplicacao_);
 
-        setExprComparacao(_exprComparacao_);
+        setExprRelacional(_exprRelacional_);
 
     }
 
@@ -36,7 +36,7 @@ public final class AMultiFator extends PFator
         return new AMultiFator(
             cloneNode(this._fator_),
             cloneNode(this._multiplicacao_),
-            cloneNode(this._exprComparacao_));
+            cloneNode(this._exprRelacional_));
     }
 
     @Override
@@ -95,16 +95,16 @@ public final class AMultiFator extends PFator
         this._multiplicacao_ = node;
     }
 
-    public PExprComparacao getExprComparacao()
+    public PExprRelacional getExprRelacional()
     {
-        return this._exprComparacao_;
+        return this._exprRelacional_;
     }
 
-    public void setExprComparacao(PExprComparacao node)
+    public void setExprRelacional(PExprRelacional node)
     {
-        if(this._exprComparacao_ != null)
+        if(this._exprRelacional_ != null)
         {
-            this._exprComparacao_.parent(null);
+            this._exprRelacional_.parent(null);
         }
 
         if(node != null)
@@ -117,7 +117,7 @@ public final class AMultiFator extends PFator
             node.parent(this);
         }
 
-        this._exprComparacao_ = node;
+        this._exprRelacional_ = node;
     }
 
     @Override
@@ -126,7 +126,7 @@ public final class AMultiFator extends PFator
         return ""
             + toString(this._fator_)
             + toString(this._multiplicacao_)
-            + toString(this._exprComparacao_);
+            + toString(this._exprRelacional_);
     }
 
     @Override
@@ -145,9 +145,9 @@ public final class AMultiFator extends PFator
             return;
         }
 
-        if(this._exprComparacao_ == child)
+        if(this._exprRelacional_ == child)
         {
-            this._exprComparacao_ = null;
+            this._exprRelacional_ = null;
             return;
         }
 
@@ -170,9 +170,9 @@ public final class AMultiFator extends PFator
             return;
         }
 
-        if(this._exprComparacao_ == oldChild)
+        if(this._exprRelacional_ == oldChild)
         {
-            setExprComparacao((PExprComparacao) newChild);
+            setExprRelacional((PExprRelacional) newChild);
             return;
         }
 
