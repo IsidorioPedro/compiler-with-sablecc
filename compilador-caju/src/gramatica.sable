@@ -1,0 +1,300 @@
+Package compilador;
+
+Helpers
+    ascii = [0 .. 127];  
+    ht = 09; // Horizontal Tab
+    lf = 10; // Line Feed
+    cr = 13; // Carriage Return
+    sp = 32; // Space
+
+    eol = cr lf | cr | lf;
+    caracteres = [ascii - [lf + cr]];
+    
+    minusculas = ['a' .. 'z'];
+    maiusculas = ['A' .. 'Z'];
+    letra = minusculas | maiusculas;
+    digito = ['0' .. '9'];
+
+    vacuo = (sp | ht | eol)+;
+    
+    sem_fecha_chave = [ascii - '}'];
+
+    comentario_linha = '#' caracteres* eol;
+    comentario_bloco = '{' sem_fecha_chave* '}';
+    comentario = comentario_linha | comentario_bloco;
+
+    caractere_multiplo = '\b' | '\t' | '\n' | '\f' | '\r' | '\"' | '\' ''' | '\\';
+    caractere_singular = [caracteres - [''' + '\']];
+    caractere_texto = [caracteres - ['"' + '\']] | caractere_multiplo;
+ 
+Tokens
+    /* tokens a serem ignorados */
+    vacuo = vacuo;
+    comentario = comentario;
+    
+    /* palavras reservadas */
+    inicio_execucao = '->';
+    inicio = 'inicio';
+    fim = 'fim';
+    
+    tipo_caractere = 'caractere';
+    tipo_numero = 'numero';
+    tipo_booleano = 'booleano';
+    tipo_vetor = 'vetor';
+    tipo_vazio = 'vazio';
+    
+    se = 'se';
+    senao = 'senao';
+    para = 'para';
+    para_cada = 'para cada';
+    enquanto = 'enquanto';
+    retorne = 'retorne';
+    
+    /* operadores e divisores */
+    ponto = '.';
+    dois_pontos = ':';
+    virgula = ',';
+    ponto_virgula = ';';
+    barra_reta = '|';
+    abre_parentese = '(';
+    fecha_parentese = ')';
+    abre_colchete = '[';
+    fecha_colchete = ']';
+    
+    soma = '+';
+    menos = '-';
+    divisao = '/';
+    multiplicacao = '*';
+    mod = '%';
+    
+    igual = '=';
+    maior = '>';
+    menor = '<';
+    atribuicao = ':=';
+    maior_igual = '>=';
+    menor_igual = '<=';
+
+    e = 'e';
+    ou = 'ou';
+    nao = 'nao';
+    
+    /* procedimentos primitivos*/
+    ler = 'ler';
+    exibir = 'exibir';
+
+    /* identificadores */
+    caractere = ''' (caractere_singular | caractere_multiplo) ''';
+    texto = '"' caractere_texto* '"';
+
+    numero = '-'? digito+ | '-'? digito+ ',' digito+;
+    
+    booleano = 'verdadeiro' | 'falso';
+    
+	id = letra (letra | digito | '_')*;
+    /*
+    vetor_declaracao = tipo_numero | tipo_booleano | tipo_caractere;
+    vetor_unidimensional = vetor_declaracao id abre_colchete inteiro fecha_colchete;
+    vetor_multidimensional = vetor_declaracao id (abre_colchete inteiro fecha_colchete)+;
+    vetor_caractere = tipo_caractere id abre_colchete inteiro fecha_colchete '=' string;
+
+    vetor = vetor_caractere | vetor_unidimensional | vetor_multidimensional;
+    */
+
+Ignored Tokens
+    comentario,
+    vacuo;
+
+Productions
+
+ /* Inicio do Programa */
+ programa =
+   {inicio} dec_var_mais;
+
+ /* Declaração de Variavel */
+ dec_variavel =
+   {decl} tipo lista_nomes ponto;
+
+ /* Lista de Nomes */
+ lista_nomes =
+   {id} id
+  |{idmais} id virgula lista_nomes;
+
+ /* Tipos */
+ tipo =
+   {base} tipo_base
+  |{vetor} tipo_vetor tipo_base tipo
+  |{expr} abre_colchete expr fecha_colchete
+  |{exprmais} abre_colchete expr fecha_colchete tipo;
+
+ /* Declaração de função */
+ dec_funcao =
+   {cominicio} inicio_execucao tipo_retorno id abre_parentese parametros fecha_parentese bloco
+  |{seminicio} tipo_retorno id abre_parentese parametros fecha_parentese bloco;
+
+ /* Parametros */
+ parametros =
+   {vazio} 
+  |{param} parametro
+  |{paramais} parametro barra_reta parametros;
+  
+ /* Parametro */
+ parametro =
+   {paramet} tipo id;
+
+  
+ /* Bloco */
+ bloco =
+   {bloco} inicio dec_var_mais com_mais fim;
+ 
+ /* Declaracao variavel mais */
+ dec_var_mais =
+   {var} dec_variavel
+   |{varmais} dec_variavel dec_var_mais;
+ 
+ /* Declaração função mais */
+ dec_fun_mais =
+   {fun} dec_funcao
+  |{funmais} dec_funcao dec_fun_mais;
+  
+ /* Comando mais */
+ com_mais =
+   {comando} comando
+  |{comandomais} comando com_mais;
+
+ /* Atribuição */
+ atrib =
+   {atrib} var atribuicao expr;
+
+ /* Lista Atribuição */
+ lista_atrib =
+   {listaatrib} atrib
+  |{listaatribmais} atrib virgula lista_atrib;
+  
+
+ /* ------------ Seção Comando ------------ */
+ 
+ comando =
+   {ifcomelse} dec_casam
+  |{ifsemelse} dec_sem_casam
+  |{enquanto} enquanto abre_parentese expr_relacional fecha_parentese comando
+  |{para} para abre_parentese aux_lista_atrib expr_relacional ponto_virgula lista_atrib fecha_parentese comando
+  |{paracada} para_cada abre_parentese tipo aux_id id fecha_parentese comando
+  |{comandoatrib} atrib ponto
+  |{retorne} aux_retorne ponto
+  |{bloco} bloco /* não feito */
+  |{chamada} chamada ponto;
+
+ /* Comando sem if e else */
+ 
+ outro =
+   {enquanto} enquanto abre_parentese expr_relacional fecha_parentese comando
+  |{para} para abre_parentese aux_lista_atrib expr_relacional ponto_virgula lista_atrib fecha_parentese comando
+  |{paracada} para_cada abre_parentese tipo aux_id id fecha_parentese comando
+  |{comandoatrib} atrib ponto
+  |{retorne} aux_retorne ponto
+  |{bloco} bloco
+  |{chamada} chamada ponto;
+  
+ /* declaracao de if com else */
+ dec_casam =
+   {ifelse} se abre_parentese expr_relacional fecha_parentese dec_casam senao comando
+  |{outra} outro;
+ 
+ /* declaracao de if sem else */
+ dec_sem_casam =
+   {if} se abre_parentese expr_relacional fecha_parentese comando
+  |{ifcont} se abre_parentese expr_relacional fecha_parentese dec_casam senao dec_sem_casam;
+
+
+ /* ------------ Fim do Exp ------------ */
+
+ /* ------------ Seção Exp ------------ */
+ 
+ /* Expressão aritmetica */
+ expr =
+   {fator} fator 
+  |{soma} expr soma fator 
+  |{menos} expr menos fator;
+
+ /* Efeito cascata da expressão aritmetica */
+ fator =
+   {relacional} expr_relacional
+  |{multi} fator multiplicacao expr_relacional 
+  |{div} fator divisao expr_relacional
+  |{mod} fator mod expr_relacional;
+ 
+ /* Expressão Relacional */ 
+ expr_relacional = 
+   {logica} expr_logica
+  |{comparacao} expr_relacional op_comp expr_logica;
+ 
+ /* Expressão Logica */
+ expr_logica =
+   {termo} termo
+  |{logica} expr_logica op_logica termo
+  |{neglogica} nao termo;
+ 
+ /* Estado Terminal das expressões */
+ termo =
+   {caractere} caractere
+  |{numero} numero 
+  |{booleano} booleano
+  |{var} var
+  |{chamada} chamada
+  |{par} abre_parentese expr fecha_parentese;
+ 
+ /* ------------ Fim do Exp ------------ */
+ 
+ /* Variavel */
+ var =
+   {id} id
+  |{vetor} var abre_colchete expr fecha_colchete;
+ 
+ /* Chamada de função */
+ chamada =
+   {funcao} id abre_parentese lista_expr fecha_parentese;
+ 
+ /* Lista de expressões para a função */
+ lista_expr = 
+   {vazio}
+  |{expressao} expr
+  |{expressaomais} expr barra_reta lista_expr;
+  
+ /* Auxiliar do Retorne */
+ aux_retorne =
+   {retornevazio} retorne
+  |{retorneexp} retorne expr;
+ 
+ /* ---------------------- Terminais ---------------------- */
+ 
+ /* Operadores de Comparação */
+ op_comp =
+   {menorque} menor
+  |{maiorque} maior
+  |{maiorigual} maior_igual
+  |{menorigual} menor_igual
+  |{igualdade} igual;
+ 
+ /* Operadores de Logica */
+ op_logica =
+   {ou} ou
+  |{e} e;
+  
+ /* Tipo de vazio */
+ tipo_retorno =
+   {tipovazio} tipo_vazio
+  |{tipobase} tipo_base;
+ 
+ /* auxiliar listaAtrib */
+ aux_lista_atrib =
+   {auxatrib} lista_atrib ponto_virgula;
+ 
+ /* auxiliar id dois_pontos */
+ aux_id =
+   {auxid} id dois_pontos;
+   
+ /* Tipos de variveis */
+ tipo_base =
+   {tiponumero} tipo_numero
+  |{tipocaractere} tipo_caractere
+  |{tipobooleano} tipo_booleano;
