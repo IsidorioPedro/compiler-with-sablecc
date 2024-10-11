@@ -137,27 +137,25 @@ Productions
     lista_atrib = atrib multiplos_atributos*; 
 
     multiplos_atributos = virgula atrib;
-
-    comando = 
-        {casado} casado |
-        {nao_casado} nao_casado |
-        {comando_simples} comando_simples;
     
-	casado = {se_senao_casado} se abre_parentese exp fecha_parentese [esquerda]:casado senao [direita]:casado;
-	
-	nao_casado = 
-        {se_nao_casado} se abre_parentese exp fecha_parentese comando |
-        {se_senao_nao_casado} se abre_parentese exp fecha_parentese casado senao nao_casado;
-	
-	comando_simples = 
-        {enquanto} enquanto abre_parentese exp fecha_parentese comando |
-        {para} para abre_parentese [declaracao]:lista_atrib [a]:ponto_virgula [condicao]:exp [b]:ponto_virgula [interacao]:lista_atrib fecha_parentese comando |
-        {para_cada} para_cada abre_parentese tipo [a]:id dois_pontos [b]:id fecha_parentese comando |
+    comando = 
+    	{comando_casam} comando_casam |
+    	{comando_sem_casam} comando_sem_casam;
+
+	comando_casam = 
+		{se_senao} se abre_parentese exp fecha_parentese [esquerda]:comando_casam senao [direita]:comando_casam | 
         {atribuicao} atrib ponto |
         {retorne} retorne exp? ponto |
         {bloco} bloco |
         {chamada} chamada ponto;
-    
+
+	comando_sem_casam = 
+		{se}  se abre_parentese exp fecha_parentese comando | 
+		{se_senao} se abre_parentese exp fecha_parentese comando_casam senao comando_sem_casam |
+        {enquanto} enquanto abre_parentese exp fecha_parentese comando |
+        {para} para abre_parentese [declaracao]:lista_atrib [a]:ponto_virgula [condicao]:exp [b]:ponto_virgula [interacao]:lista_atrib fecha_parentese comando |
+        {para_cada} para_cada abre_parentese tipo [a]:id dois_pontos [b]:id fecha_parentese comando;
+
     var = 
         {identificador} id |
         {variavel} var abre_colchete exp fecha_colchete; 
