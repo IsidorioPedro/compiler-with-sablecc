@@ -86,7 +86,7 @@ Tokens
     caractere = ''' (caractere_singular | caractere_multiplo) ''';
     texto = '"' caractere_texto* '"';
 
-    numero = '-'? digito+ | '-'? digito+ ',' digito+;
+    numero = digito+ | digito+ ',' digito+;
     
     booleano = 'verdadeiro' | 'falso';
     
@@ -190,12 +190,16 @@ Productions
     fator_aritmetico =
         {parentese_aritmetica} abre_parentese expressao_aritmetica fecha_parentese |
         {variavel} var |
-        {numero} numero |
+        {numero} numero_com_sinal |
         {booleano} booleano |
         {chamada} chamada | 
         {caractere} caractere |
         {texto} texto;
-
+		
+	numero_com_sinal = 
+		{numero_positivo} numero |
+		{numero_negativo} menos numero;
+		
     exp = 
         {exp_aritmetica} expressao_aritmetica |
         {exp_logica} expressao_logica;
