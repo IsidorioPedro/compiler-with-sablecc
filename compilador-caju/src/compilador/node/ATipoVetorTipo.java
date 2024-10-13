@@ -6,22 +6,22 @@ import java.util.*;
 import compilador.analysis.*;
 
 @SuppressWarnings("nls")
-public final class AVariavelVar extends PVar
+public final class ATipoVetorTipo extends PTipo
 {
-    private TId _id_;
+    private PTipoBase _tipoBase_;
     private final LinkedList<PExp> _exp_ = new LinkedList<PExp>();
 
-    public AVariavelVar()
+    public ATipoVetorTipo()
     {
         // Constructor
     }
 
-    public AVariavelVar(
-        @SuppressWarnings("hiding") TId _id_,
+    public ATipoVetorTipo(
+        @SuppressWarnings("hiding") PTipoBase _tipoBase_,
         @SuppressWarnings("hiding") List<?> _exp_)
     {
         // Constructor
-        setId(_id_);
+        setTipoBase(_tipoBase_);
 
         setExp(_exp_);
 
@@ -30,27 +30,27 @@ public final class AVariavelVar extends PVar
     @Override
     public Object clone()
     {
-        return new AVariavelVar(
-            cloneNode(this._id_),
+        return new ATipoVetorTipo(
+            cloneNode(this._tipoBase_),
             cloneList(this._exp_));
     }
 
     @Override
     public void apply(Switch sw)
     {
-        ((Analysis) sw).caseAVariavelVar(this);
+        ((Analysis) sw).caseATipoVetorTipo(this);
     }
 
-    public TId getId()
+    public PTipoBase getTipoBase()
     {
-        return this._id_;
+        return this._tipoBase_;
     }
 
-    public void setId(TId node)
+    public void setTipoBase(PTipoBase node)
     {
-        if(this._id_ != null)
+        if(this._tipoBase_ != null)
         {
-            this._id_.parent(null);
+            this._tipoBase_.parent(null);
         }
 
         if(node != null)
@@ -63,7 +63,7 @@ public final class AVariavelVar extends PVar
             node.parent(this);
         }
 
-        this._id_ = node;
+        this._tipoBase_ = node;
     }
 
     public LinkedList<PExp> getExp()
@@ -96,7 +96,7 @@ public final class AVariavelVar extends PVar
     public String toString()
     {
         return ""
-            + toString(this._id_)
+            + toString(this._tipoBase_)
             + toString(this._exp_);
     }
 
@@ -104,9 +104,9 @@ public final class AVariavelVar extends PVar
     void removeChild(@SuppressWarnings("unused") Node child)
     {
         // Remove child
-        if(this._id_ == child)
+        if(this._tipoBase_ == child)
         {
-            this._id_ = null;
+            this._tipoBase_ = null;
             return;
         }
 
@@ -122,9 +122,9 @@ public final class AVariavelVar extends PVar
     void replaceChild(@SuppressWarnings("unused") Node oldChild, @SuppressWarnings("unused") Node newChild)
     {
         // Replace child
-        if(this._id_ == oldChild)
+        if(this._tipoBase_ == oldChild)
         {
-            setId((TId) newChild);
+            setTipoBase((PTipoBase) newChild);
             return;
         }
 

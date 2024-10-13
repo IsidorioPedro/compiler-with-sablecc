@@ -2,43 +2,42 @@
 
 package compilador.node;
 
-import java.util.*;
 import compilador.analysis.*;
 
 @SuppressWarnings("nls")
-public final class AVariavelVar extends PVar
+public final class AChamadaChamada extends PChamada
 {
     private TId _id_;
-    private final LinkedList<PExp> _exp_ = new LinkedList<PExp>();
+    private PListaExp _listaExp_;
 
-    public AVariavelVar()
+    public AChamadaChamada()
     {
         // Constructor
     }
 
-    public AVariavelVar(
+    public AChamadaChamada(
         @SuppressWarnings("hiding") TId _id_,
-        @SuppressWarnings("hiding") List<?> _exp_)
+        @SuppressWarnings("hiding") PListaExp _listaExp_)
     {
         // Constructor
         setId(_id_);
 
-        setExp(_exp_);
+        setListaExp(_listaExp_);
 
     }
 
     @Override
     public Object clone()
     {
-        return new AVariavelVar(
+        return new AChamadaChamada(
             cloneNode(this._id_),
-            cloneList(this._exp_));
+            cloneNode(this._listaExp_));
     }
 
     @Override
     public void apply(Switch sw)
     {
-        ((Analysis) sw).caseAVariavelVar(this);
+        ((Analysis) sw).caseAChamadaChamada(this);
     }
 
     public TId getId()
@@ -66,30 +65,29 @@ public final class AVariavelVar extends PVar
         this._id_ = node;
     }
 
-    public LinkedList<PExp> getExp()
+    public PListaExp getListaExp()
     {
-        return this._exp_;
+        return this._listaExp_;
     }
 
-    public void setExp(List<?> list)
+    public void setListaExp(PListaExp node)
     {
-        for(PExp e : this._exp_)
+        if(this._listaExp_ != null)
         {
-            e.parent(null);
+            this._listaExp_.parent(null);
         }
-        this._exp_.clear();
 
-        for(Object obj_e : list)
+        if(node != null)
         {
-            PExp e = (PExp) obj_e;
-            if(e.parent() != null)
+            if(node.parent() != null)
             {
-                e.parent().removeChild(e);
+                node.parent().removeChild(node);
             }
 
-            e.parent(this);
-            this._exp_.add(e);
+            node.parent(this);
         }
+
+        this._listaExp_ = node;
     }
 
     @Override
@@ -97,7 +95,7 @@ public final class AVariavelVar extends PVar
     {
         return ""
             + toString(this._id_)
-            + toString(this._exp_);
+            + toString(this._listaExp_);
     }
 
     @Override
@@ -110,8 +108,9 @@ public final class AVariavelVar extends PVar
             return;
         }
 
-        if(this._exp_.remove(child))
+        if(this._listaExp_ == child)
         {
+            this._listaExp_ = null;
             return;
         }
 
@@ -128,22 +127,10 @@ public final class AVariavelVar extends PVar
             return;
         }
 
-        for(ListIterator<PExp> i = this._exp_.listIterator(); i.hasNext();)
+        if(this._listaExp_ == oldChild)
         {
-            if(i.next() == oldChild)
-            {
-                if(newChild != null)
-                {
-                    i.set((PExp) newChild);
-                    newChild.parent(this);
-                    oldChild.parent(null);
-                    return;
-                }
-
-                i.remove();
-                oldChild.parent(null);
-                return;
-            }
+            setListaExp((PListaExp) newChild);
+            return;
         }
 
         throw new RuntimeException("Not a child.");

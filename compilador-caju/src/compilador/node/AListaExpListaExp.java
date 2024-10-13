@@ -8,8 +8,7 @@ import compilador.analysis.*;
 @SuppressWarnings("nls")
 public final class AListaExpListaExp extends PListaExp
 {
-    private PExp _exp_;
-    private final LinkedList<PMultiplosExp> _multiplosExp_ = new LinkedList<PMultiplosExp>();
+    private final LinkedList<PExp> _exp_ = new LinkedList<PExp>();
 
     public AListaExpListaExp()
     {
@@ -17,13 +16,10 @@ public final class AListaExpListaExp extends PListaExp
     }
 
     public AListaExpListaExp(
-        @SuppressWarnings("hiding") PExp _exp_,
-        @SuppressWarnings("hiding") List<?> _multiplosExp_)
+        @SuppressWarnings("hiding") List<?> _exp_)
     {
         // Constructor
         setExp(_exp_);
-
-        setMultiplosExp(_multiplosExp_);
 
     }
 
@@ -31,8 +27,7 @@ public final class AListaExpListaExp extends PListaExp
     public Object clone()
     {
         return new AListaExpListaExp(
-            cloneNode(this._exp_),
-            cloneList(this._multiplosExp_));
+            cloneList(this._exp_));
     }
 
     @Override
@@ -41,54 +36,29 @@ public final class AListaExpListaExp extends PListaExp
         ((Analysis) sw).caseAListaExpListaExp(this);
     }
 
-    public PExp getExp()
+    public LinkedList<PExp> getExp()
     {
         return this._exp_;
     }
 
-    public void setExp(PExp node)
+    public void setExp(List<?> list)
     {
-        if(this._exp_ != null)
-        {
-            this._exp_.parent(null);
-        }
-
-        if(node != null)
-        {
-            if(node.parent() != null)
-            {
-                node.parent().removeChild(node);
-            }
-
-            node.parent(this);
-        }
-
-        this._exp_ = node;
-    }
-
-    public LinkedList<PMultiplosExp> getMultiplosExp()
-    {
-        return this._multiplosExp_;
-    }
-
-    public void setMultiplosExp(List<?> list)
-    {
-        for(PMultiplosExp e : this._multiplosExp_)
+        for(PExp e : this._exp_)
         {
             e.parent(null);
         }
-        this._multiplosExp_.clear();
+        this._exp_.clear();
 
         for(Object obj_e : list)
         {
-            PMultiplosExp e = (PMultiplosExp) obj_e;
+            PExp e = (PExp) obj_e;
             if(e.parent() != null)
             {
                 e.parent().removeChild(e);
             }
 
             e.parent(this);
-            this._multiplosExp_.add(e);
+            this._exp_.add(e);
         }
     }
 
@@ -96,21 +66,14 @@ public final class AListaExpListaExp extends PListaExp
     public String toString()
     {
         return ""
-            + toString(this._exp_)
-            + toString(this._multiplosExp_);
+            + toString(this._exp_);
     }
 
     @Override
     void removeChild(@SuppressWarnings("unused") Node child)
     {
         // Remove child
-        if(this._exp_ == child)
-        {
-            this._exp_ = null;
-            return;
-        }
-
-        if(this._multiplosExp_.remove(child))
+        if(this._exp_.remove(child))
         {
             return;
         }
@@ -122,19 +85,13 @@ public final class AListaExpListaExp extends PListaExp
     void replaceChild(@SuppressWarnings("unused") Node oldChild, @SuppressWarnings("unused") Node newChild)
     {
         // Replace child
-        if(this._exp_ == oldChild)
-        {
-            setExp((PExp) newChild);
-            return;
-        }
-
-        for(ListIterator<PMultiplosExp> i = this._multiplosExp_.listIterator(); i.hasNext();)
+        for(ListIterator<PExp> i = this._exp_.listIterator(); i.hasNext();)
         {
             if(i.next() == oldChild)
             {
                 if(newChild != null)
                 {
-                    i.set((PMultiplosExp) newChild);
+                    i.set((PExp) newChild);
                     newChild.parent(this);
                     oldChild.parent(null);
                     return;

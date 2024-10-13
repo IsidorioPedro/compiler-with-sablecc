@@ -97,117 +97,210 @@ Ignored Tokens
     vacuo;
 
 Productions
+    programa {-> programa} = 
+        dec_variavel* dec_funcao* {-> New programa([dec_variavel], [dec_funcao])};
+
+    dec_variavel {-> dec_variavel} = 
+        tipo var lista_nomes* ponto {-> New dec_variavel.dec_variavel(tipo.tipo, [var.var, lista_nomes.var])};
+
+	lista_nomes {-> var} = 
+        virgula var {-> var.var};
+	
+    tipo {-> tipo} = 
+        {base} tipo_base {-> New tipo.tipo_base(tipo_base)} |
+        {vetor} tipo_vetor tipo_base exp_entre_colchetes+ {-> New tipo.tipo_vetor(tipo_base, [exp_entre_colchetes.exp])};
+
+    exp_entre_colchetes {-> exp} = 
+        abre_colchete exp fecha_colchete {-> exp};
+
+    tipo_base {-> tipo_base} = 
+        {numero} tipo_numero {-> New tipo_base.numero(tipo_numero)} |
+        {caractere} tipo_caractere {-> New tipo_base.caractere(tipo_caractere)} |
+        {booleano} tipo_booleano {-> New tipo_base.booleano(tipo_booleano)};
+
+    dec_funcao {-> dec_funcao} = 
+        {funcao} tipo_retorno id abre_parentese parametros fecha_parentese bloco {-> New dec_funcao.comum(tipo_retorno, id, parametros, bloco)} | 
+        {funcao_incial} inicio_execucao tipo_retorno id abre_parentese parametros fecha_parentese bloco {-> New dec_funcao.inicial(tipo_retorno, id, parametros, bloco)};
+
+    tipo_retorno {-> tipo_retorno} = 
+        {nao_vazio} tipo {-> New tipo_retorno.nao_vazio(tipo)} |
+        {vazio} tipo_vazio {-> New tipo_retorno.vazio(tipo_vazio)};
+
+    parametro {-> parametro} = 
+        tipo id {-> New parametro.parametro(tipo, id)};
+
+    parametros {-> parametros} = 
+        {param} parametro multiplos_parametros* {-> New parametros.param([parametro.parametro, multiplos_parametros.parametro])} |
+        {empty} {-> New parametros.empty()};
+
+    multiplos_parametros {-> parametro} = 
+        barra_reta parametro {-> parametro.parametro};
+
+    bloco {-> bloco} = 
+        inicio dec_variavel* comando* fim {-> New bloco.bloco([dec_variavel], [comando])};
+    
+    atrib {-> atrib} = 
+        var atribuicao exp {-> New atrib.atrib(var, exp)};
+
+    lista_atrib {-> lista_atrib} = 
+        atrib multiplos_atributos* {-> New lista_atrib.lista_atrib([atrib.atrib, multiplos_atributos.atrib])};
+
+    multiplos_atributos {-> atrib}  = 
+        virgula atrib {-> atrib.atrib};
+
+    comando {-> comando} = 
+        {comando_casam} comando_casam {-> comando_casam.comando} |
+        {comando_sem_casam} comando_sem_casam {-> comando_sem_casam.comando};
+
+    comando_casam {-> comando} = 
+        {se_senao} se abre_parentese exp fecha_parentese [esquerda]:comando_casam senao [direita]:comando_casam {-> New comando.se_senao(exp, esquerda.comando, direita.comando)} | 
+        {atribuicao} atrib ponto {-> New comando.atribuicao(atrib)} |
+        {retorne} retorne exp? ponto {-> New comando.retorne(exp)} |
+        {bloco} bloco {-> New comando.bloco(bloco)} |
+        {chamada} chamada ponto {-> New comando.chamada(chamada)};
+
+    comando_sem_casam {-> comando} = 
+        {se} se abre_parentese exp fecha_parentese comando {-> New comando.se(exp, comando)} | 
+        {se_senao} se abre_parentese exp fecha_parentese comando_casam senao comando_sem_casam {-> New comando.se_senao(exp, comando_casam.comando, comando_sem_casam.comando)} |
+        {enquanto} enquanto abre_parentese exp fecha_parentese comando {-> New comando.enquanto(exp, comando)} |
+        {para} para abre_parentese [declaracao]:lista_atrib [a]:ponto_virgula [condicao]:exp [b]:ponto_virgula [interacao]:lista_atrib fecha_parentese comando {-> New comando.para(declaracao.lista_atrib, condicao.exp, interacao.lista_atrib, comando)} |
+        {para_cada} para_cada abre_parentese tipo [a]:id dois_pontos [b]:id fecha_parentese comando {-> New comando.para_cada(tipo, a, b, comando)};
+
+    var {-> var} = 
+        {identificador} id {-> New var.identificador(id)} |
+        {variavel} id exp_entre_colchetes+  {-> New var.variavel(id, [exp_entre_colchetes.exp])};
+	
+    expressao_logica {-> exp} = 
+        {e} termo_logico e expressao_logica {-> New exp.e(termo_logico.exp, expressao_logica.exp)} |
+        {ou} termo_logico ou expressao_logica {-> New exp.ou(termo_logico.exp, expressao_logica.exp)} |
+        {nao} nao expressao_logica {-> New exp.nao(expressao_logica.exp)} |
+        {termo} termo_logico {-> termo_logico.exp};
+
+    termo_logico {-> exp} = 
+        {parentese_logica} abre_parentese expressao_logica fecha_parentese {-> expressao_logica.exp} |
+        {relacional} expressao_relacional {-> expressao_relacional.exp};
+
+    expressao_relacional {-> exp} = 
+        {igual} [esquerda]:expressao_aritmetica igual [direita]:expressao_aritmetica {-> New exp.igual(esquerda.exp, direita.exp)} |
+        {maior} [esquerda]:expressao_aritmetica maior [direita]:expressao_aritmetica {-> New exp.maior(esquerda.exp, direita.exp)} |
+        {menor} [esquerda]:expressao_aritmetica menor [direita]:expressao_aritmetica {-> New exp.menor(esquerda.exp, direita.exp)} |
+        {maior_igual} [esquerda]:expressao_aritmetica maior_igual [direita]:expressao_aritmetica {-> New exp.maior_igual(esquerda.exp, direita.exp)} |
+        {menor_igual} [esquerda]:expressao_aritmetica menor_igual [direita]:expressao_aritmetica {-> New exp.menor_igual(esquerda.exp, direita.exp)};
+
+    expressao_aritmetica {-> exp} = 
+        {soma} termo_aritmetico mais expressao_aritmetica {-> New exp.soma(termo_aritmetico.exp, expressao_aritmetica.exp)} |
+        {subtracao} termo_aritmetico menos expressao_aritmetica {-> New exp.subtracao(termo_aritmetico.exp, expressao_aritmetica.exp)} |
+        {termo} termo_aritmetico {-> termo_aritmetico.exp};
+
+    termo_aritmetico {-> exp} = 
+        {multiplicacao} fator_aritmetico multiplicacao termo_aritmetico {-> New exp.multiplicacao(fator_aritmetico.exp, termo_aritmetico.exp)} |
+        {divisao} fator_aritmetico divisao termo_aritmetico {-> New exp.divisao(fator_aritmetico.exp, termo_aritmetico.exp)} |
+        {fator} fator_aritmetico {-> fator_aritmetico.exp};
+
+    fator_aritmetico {-> exp} = 
+        {parentese_aritmetica} abre_parentese expressao_aritmetica fecha_parentese {-> expressao_aritmetica.exp} |
+        {variavel} var {-> New exp.variavel(var)} |
+        {numero} numero_com_sinal {-> New exp.numero(numero_com_sinal)} |
+        {booleano} booleano {-> New exp.booleano(booleano)} |
+        {chamada} chamada {-> New exp.chamada(chamada)} | 
+        {caractere} caractere {-> New exp.caractere(caractere)} |
+        {texto} texto {-> New exp.texto(texto)};
+
+    numero_com_sinal {-> numero_com_sinal} = 
+        {positivo} numero {-> New numero_com_sinal.positivo(numero)} |
+        {negativo} menos numero {-> New numero_com_sinal.negativo(numero)};
+
+    exp {-> exp} = 
+        {exp_aritmetica} expressao_aritmetica {-> expressao_aritmetica.exp} |
+        {exp_logica} expressao_logica {-> expressao_logica.exp};
+
+    chamada {-> chamada} = 
+        id abre_parentese lista_exp fecha_parentese {-> New chamada.chamada(id, lista_exp)};
+
+    lista_exp {-> lista_exp} = 
+        {args} exp multiplos_exp* {-> New lista_exp.lista_exp([exp, multiplos_exp.exp])} |
+        {empty} {-> New lista_exp.empty()};
+
+    multiplos_exp {-> exp} = 
+        barra_reta exp {-> exp};
+
+//---------------------------------------------------------------------------------------------------------------------------------------------------------
+Abstract Syntax Tree
+//---------------------------------------------------------------------------------------------------------------------------------------------------------
     programa = dec_variavel* dec_funcao*;
 
-    dec_variavel = tipo lista_nomes ponto;
+	dec_variavel = {dec_variavel} tipo [lista_nomes]:var*;
+	
+	dec_funcao = 
+        {comum} tipo_retorno id parametros bloco | 
+        {inicial} tipo_retorno id parametros bloco;
 
-    lista_nomes = id multiplos_ids*; 
-    
-    multiplos_ids = virgula id;
-    
+    parametros = 
+        {param} [parametros]:parametro+ | 
+        {empty};
+
+    parametro = {parametro} tipo id;
+
     tipo = 
-    	{base} tipo_base |
-    	{vetor} tipo_vetor tipo_base exp_entre_colchetes+;
-    
-    exp_entre_colchetes = abre_colchete exp fecha_colchete;
-    
+        {tipo_base} tipo_base | 
+        {tipo_vetor} tipo_base exp+;     
+
     tipo_base = 
-    	{numero} tipo_numero |
-    	{caractere} tipo_caractere |
-    	{booleano} tipo_booleano;
-    
-  	dec_funcao = inicio_execucao? tipo_retorno id abre_parentese parametros fecha_parentese bloco;
-	
-	tipo_retorno =
-		{nao_vazio} tipo |
-		{vazio} tipo_vazio;
-	
-	parametro = tipo id;
-	
-	parametros = 
-		{param} parametro multiplos_parametros* |
-		{empity};
-    
-    multiplos_parametros = barra_reta parametro;
-    
-    bloco = inicio dec_variavel* comando* fim;
-    
-    atrib = var atribuicao exp;
-    
-    lista_atrib = atrib multiplos_atributos*; 
+        {numero} tipo_numero | 
+        {caractere} tipo_caractere | 
+        {booleano} tipo_booleano;
 
-    multiplos_atributos = virgula atrib;
-    
-    comando = 
-    	{comando_casam} comando_casam |
-    	{comando_sem_casam} comando_sem_casam;
-
-	comando_casam = 
-		{se_senao} se abre_parentese exp fecha_parentese [esquerda]:comando_casam senao [direita]:comando_casam | 
-        {atribuicao} atrib ponto |
-        {retorne} retorne exp? ponto |
-        {bloco} bloco |
-        {chamada} chamada ponto;
-
-	comando_sem_casam = 
-		{se}  se abre_parentese exp fecha_parentese comando | 
-		{se_senao} se abre_parentese exp fecha_parentese comando_casam senao comando_sem_casam |
-        {enquanto} enquanto abre_parentese exp fecha_parentese comando |
-        {para} para abre_parentese [declaracao]:lista_atrib [a]:ponto_virgula [condicao]:exp [b]:ponto_virgula [interacao]:lista_atrib fecha_parentese comando |
-        {para_cada} para_cada abre_parentese tipo [a]:id dois_pontos [b]:id fecha_parentese comando;
+    tipo_retorno = 
+        {nao_vazio} tipo | 
+        {vazio} tipo_vazio;
 
     var = 
-        {identificador} id |
-        {variavel} var abre_colchete exp fecha_colchete; 
-	
-    expressao_logica  = 
-        {e} termo_logico e expressao_logica |
-        {ou} termo_logico ou expressao_logica |
-        {nao} nao expressao_logica |
-        {termo} termo_logico;
+        {identificador} id | 
+        {variavel} id exp+;
 
-    termo_logico = 
-        {parentese_logica} abre_parentese expressao_logica fecha_parentese |
-        {relacional} expressao_relacional;
+    bloco = {bloco} dec_variavel* comando*;
 
-    expressao_relacional = 
-        {igual} [esquerda]:expressao_aritmetica igual [direita]:expressao_aritmetica |
-        {maior} [esquerda]:expressao_aritmetica maior [direita]:expressao_aritmetica |
-        {menor} [esquerda]:expressao_aritmetica menor [direita]:expressao_aritmetica |
-        {maior_igual} [esquerda]:expressao_aritmetica maior_igual [direita]:expressao_aritmetica |
-        {menor_igual} [esquerda]:expressao_aritmetica menor_igual [direita]:expressao_aritmetica;
+    comando = 
+        {se_senao} exp [esquerda]:comando [direita]:comando | 
+        {se} exp comando | 
+        {enquanto} exp comando | 
+        {para} [esquerda]:lista_atrib exp [direita]:lista_atrib comando | 
+        {para_cada} tipo [esquerda]:id [direita]:id comando | 
+        {retorne} exp? | 
+        {atribuicao} atrib | 
+        {bloco} bloco | 
+        {chamada} chamada;
 
-    expressao_aritmetica = 
-        {soma} termo_aritmetico mais expressao_aritmetica |
-        {subtracao} termo_aritmetico menos expressao_aritmetica |
-        {termo} termo_aritmetico ;
+    lista_atrib = {lista_atrib} atrib+;
 
-    termo_aritmetico = 
-        {multiplicacao} fator_aritmetico multiplicacao termo_aritmetico |
-        {divisao} fator_aritmetico divisao termo_aritmetico |
-        {fator} fator_aritmetico;
+    atrib = {atrib} var exp;
 
-    fator_aritmetico =
-        {parentese_aritmetica} abre_parentese expressao_aritmetica fecha_parentese |
-        {variavel} var |
-        {numero} numero_com_sinal |
-        {booleano} booleano |
-        {chamada} chamada | 
-        {caractere} caractere |
-        {texto} texto;
-		
-	numero_com_sinal = 
-		{numero_positivo} numero |
-		{numero_negativo} menos numero;
-		
-    exp = 
-        {exp_aritmetica} expressao_aritmetica |
-        {exp_logica} expressao_logica;
-    
-    chamada = id abre_parentese lista_exp fecha_parentese;
+    chamada = {chamada} id lista_exp;
 
     lista_exp = 
-        {lista_exp} exp multiplos_exp* |
-        {empity};
-    
-    multiplos_exp = barra_reta exp;
+        {lista_exp} exp+ | 
+        {empty};
+
+    numero_com_sinal = 
+        {positivo} numero | 
+        {negativo} numero;
+
+    exp = 
+        {e} [esquerda]:exp [direita]:exp | 
+        {ou} [esquerda]:exp [direita]:exp | 
+        {nao} exp |
+        {igual} [esquerda]:exp [direita]:exp | 
+        {menor} [esquerda]:exp [direita]:exp | 
+        {maior} [esquerda]:exp [direita]:exp | 
+        {menor_igual} [esquerda]:exp [direita]:exp | 
+        {maior_igual} [esquerda]:exp [direita]:exp | 
+        {soma} [esquerda]:exp [direita]:exp | 
+        {subtracao} [esquerda]:exp [direita]:exp | 
+        {multiplicacao} [esquerda]:exp [direita]:exp | 
+        {divisao} [esquerda]:exp [direita]:exp | 
+        {variavel} var | 
+        {numero} numero_com_sinal  | 
+        {booleano} booleano | 
+        {caractere} caractere | 
+        {texto} texto | 
+        {chamada} chamada;

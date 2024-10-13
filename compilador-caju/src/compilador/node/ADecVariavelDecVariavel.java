@@ -6,51 +6,51 @@ import java.util.*;
 import compilador.analysis.*;
 
 @SuppressWarnings("nls")
-public final class AVariavelVar extends PVar
+public final class ADecVariavelDecVariavel extends PDecVariavel
 {
-    private TId _id_;
-    private final LinkedList<PExp> _exp_ = new LinkedList<PExp>();
+    private PTipo _tipo_;
+    private final LinkedList<PVar> _listaNomes_ = new LinkedList<PVar>();
 
-    public AVariavelVar()
+    public ADecVariavelDecVariavel()
     {
         // Constructor
     }
 
-    public AVariavelVar(
-        @SuppressWarnings("hiding") TId _id_,
-        @SuppressWarnings("hiding") List<?> _exp_)
+    public ADecVariavelDecVariavel(
+        @SuppressWarnings("hiding") PTipo _tipo_,
+        @SuppressWarnings("hiding") List<?> _listaNomes_)
     {
         // Constructor
-        setId(_id_);
+        setTipo(_tipo_);
 
-        setExp(_exp_);
+        setListaNomes(_listaNomes_);
 
     }
 
     @Override
     public Object clone()
     {
-        return new AVariavelVar(
-            cloneNode(this._id_),
-            cloneList(this._exp_));
+        return new ADecVariavelDecVariavel(
+            cloneNode(this._tipo_),
+            cloneList(this._listaNomes_));
     }
 
     @Override
     public void apply(Switch sw)
     {
-        ((Analysis) sw).caseAVariavelVar(this);
+        ((Analysis) sw).caseADecVariavelDecVariavel(this);
     }
 
-    public TId getId()
+    public PTipo getTipo()
     {
-        return this._id_;
+        return this._tipo_;
     }
 
-    public void setId(TId node)
+    public void setTipo(PTipo node)
     {
-        if(this._id_ != null)
+        if(this._tipo_ != null)
         {
-            this._id_.parent(null);
+            this._tipo_.parent(null);
         }
 
         if(node != null)
@@ -63,32 +63,32 @@ public final class AVariavelVar extends PVar
             node.parent(this);
         }
 
-        this._id_ = node;
+        this._tipo_ = node;
     }
 
-    public LinkedList<PExp> getExp()
+    public LinkedList<PVar> getListaNomes()
     {
-        return this._exp_;
+        return this._listaNomes_;
     }
 
-    public void setExp(List<?> list)
+    public void setListaNomes(List<?> list)
     {
-        for(PExp e : this._exp_)
+        for(PVar e : this._listaNomes_)
         {
             e.parent(null);
         }
-        this._exp_.clear();
+        this._listaNomes_.clear();
 
         for(Object obj_e : list)
         {
-            PExp e = (PExp) obj_e;
+            PVar e = (PVar) obj_e;
             if(e.parent() != null)
             {
                 e.parent().removeChild(e);
             }
 
             e.parent(this);
-            this._exp_.add(e);
+            this._listaNomes_.add(e);
         }
     }
 
@@ -96,21 +96,21 @@ public final class AVariavelVar extends PVar
     public String toString()
     {
         return ""
-            + toString(this._id_)
-            + toString(this._exp_);
+            + toString(this._tipo_)
+            + toString(this._listaNomes_);
     }
 
     @Override
     void removeChild(@SuppressWarnings("unused") Node child)
     {
         // Remove child
-        if(this._id_ == child)
+        if(this._tipo_ == child)
         {
-            this._id_ = null;
+            this._tipo_ = null;
             return;
         }
 
-        if(this._exp_.remove(child))
+        if(this._listaNomes_.remove(child))
         {
             return;
         }
@@ -122,19 +122,19 @@ public final class AVariavelVar extends PVar
     void replaceChild(@SuppressWarnings("unused") Node oldChild, @SuppressWarnings("unused") Node newChild)
     {
         // Replace child
-        if(this._id_ == oldChild)
+        if(this._tipo_ == oldChild)
         {
-            setId((TId) newChild);
+            setTipo((PTipo) newChild);
             return;
         }
 
-        for(ListIterator<PExp> i = this._exp_.listIterator(); i.hasNext();)
+        for(ListIterator<PVar> i = this._listaNomes_.listIterator(); i.hasNext();)
         {
             if(i.next() == oldChild)
             {
                 if(newChild != null)
                 {
-                    i.set((PExp) newChild);
+                    i.set((PVar) newChild);
                     newChild.parent(this);
                     oldChild.parent(null);
                     return;

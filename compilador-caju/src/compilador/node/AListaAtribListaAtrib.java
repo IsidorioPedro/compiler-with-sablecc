@@ -6,59 +6,59 @@ import java.util.*;
 import compilador.analysis.*;
 
 @SuppressWarnings("nls")
-public final class AParamParametros extends PParametros
+public final class AListaAtribListaAtrib extends PListaAtrib
 {
-    private final LinkedList<PParametro> _parametros_ = new LinkedList<PParametro>();
+    private final LinkedList<PAtrib> _atrib_ = new LinkedList<PAtrib>();
 
-    public AParamParametros()
+    public AListaAtribListaAtrib()
     {
         // Constructor
     }
 
-    public AParamParametros(
-        @SuppressWarnings("hiding") List<?> _parametros_)
+    public AListaAtribListaAtrib(
+        @SuppressWarnings("hiding") List<?> _atrib_)
     {
         // Constructor
-        setParametros(_parametros_);
+        setAtrib(_atrib_);
 
     }
 
     @Override
     public Object clone()
     {
-        return new AParamParametros(
-            cloneList(this._parametros_));
+        return new AListaAtribListaAtrib(
+            cloneList(this._atrib_));
     }
 
     @Override
     public void apply(Switch sw)
     {
-        ((Analysis) sw).caseAParamParametros(this);
+        ((Analysis) sw).caseAListaAtribListaAtrib(this);
     }
 
-    public LinkedList<PParametro> getParametros()
+    public LinkedList<PAtrib> getAtrib()
     {
-        return this._parametros_;
+        return this._atrib_;
     }
 
-    public void setParametros(List<?> list)
+    public void setAtrib(List<?> list)
     {
-        for(PParametro e : this._parametros_)
+        for(PAtrib e : this._atrib_)
         {
             e.parent(null);
         }
-        this._parametros_.clear();
+        this._atrib_.clear();
 
         for(Object obj_e : list)
         {
-            PParametro e = (PParametro) obj_e;
+            PAtrib e = (PAtrib) obj_e;
             if(e.parent() != null)
             {
                 e.parent().removeChild(e);
             }
 
             e.parent(this);
-            this._parametros_.add(e);
+            this._atrib_.add(e);
         }
     }
 
@@ -66,14 +66,14 @@ public final class AParamParametros extends PParametros
     public String toString()
     {
         return ""
-            + toString(this._parametros_);
+            + toString(this._atrib_);
     }
 
     @Override
     void removeChild(@SuppressWarnings("unused") Node child)
     {
         // Remove child
-        if(this._parametros_.remove(child))
+        if(this._atrib_.remove(child))
         {
             return;
         }
@@ -85,13 +85,13 @@ public final class AParamParametros extends PParametros
     void replaceChild(@SuppressWarnings("unused") Node oldChild, @SuppressWarnings("unused") Node newChild)
     {
         // Replace child
-        for(ListIterator<PParametro> i = this._parametros_.listIterator(); i.hasNext();)
+        for(ListIterator<PAtrib> i = this._atrib_.listIterator(); i.hasNext();)
         {
             if(i.next() == oldChild)
             {
                 if(newChild != null)
                 {
-                    i.set((PParametro) newChild);
+                    i.set((PAtrib) newChild);
                     newChild.parent(this);
                     oldChild.parent(null);
                     return;
