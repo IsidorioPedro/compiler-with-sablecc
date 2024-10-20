@@ -1,4 +1,7 @@
-vazio insertionSort(vetor numero[] lista | numero n)
+
+numero a.
+
+vazio insertionSort(vetor numero [2] lista | numero n)
 inicio
     numero i, j, chave.
 
@@ -19,7 +22,7 @@ inicio
     fim
 fim
 
-vazio exibirLista(vetor numero[] lista | numero n)
+vazio exibirLista(vetor numero [2] lista | numero n)
 inicio
     numero i.
 
@@ -31,7 +34,7 @@ inicio
     exibir('\n').
 fim
 
-numero solicitarOrdenacao(vetor numero[] lista | numero n)
+numero solicitarOrdenacao(vetor numero [2] lista | numero n)
 inicio
     se (n < 1)
     inicio
@@ -40,7 +43,7 @@ inicio
     senao
     inicio
         exibir("Lista pre ordenacao:\n").
-        exibirLista(lista | n).
+        exibirLista( lista | n ).
 
         insertionSort(lista | n).
 
