@@ -2,6 +2,7 @@
 
 package compilador.node;
 
+import java.util.*;
 import compilador.analysis.*;
 
 @SuppressWarnings("nls")
@@ -9,7 +10,7 @@ public final class AComumDecFuncao extends PDecFuncao
 {
     private PTipoRetorno _tipoRetorno_;
     private TId _id_;
-    private PParametros _parametros_;
+    private final LinkedList<PParametro> _parametros_ = new LinkedList<PParametro>();
     private PBloco _bloco_;
 
     public AComumDecFuncao()
@@ -20,7 +21,7 @@ public final class AComumDecFuncao extends PDecFuncao
     public AComumDecFuncao(
         @SuppressWarnings("hiding") PTipoRetorno _tipoRetorno_,
         @SuppressWarnings("hiding") TId _id_,
-        @SuppressWarnings("hiding") PParametros _parametros_,
+        @SuppressWarnings("hiding") List<?> _parametros_,
         @SuppressWarnings("hiding") PBloco _bloco_)
     {
         // Constructor
@@ -40,7 +41,7 @@ public final class AComumDecFuncao extends PDecFuncao
         return new AComumDecFuncao(
             cloneNode(this._tipoRetorno_),
             cloneNode(this._id_),
-            cloneNode(this._parametros_),
+            cloneList(this._parametros_),
             cloneNode(this._bloco_));
     }
 
@@ -100,29 +101,30 @@ public final class AComumDecFuncao extends PDecFuncao
         this._id_ = node;
     }
 
-    public PParametros getParametros()
+    public LinkedList<PParametro> getParametros()
     {
         return this._parametros_;
     }
 
-    public void setParametros(PParametros node)
+    public void setParametros(List<?> list)
     {
-        if(this._parametros_ != null)
+        for(PParametro e : this._parametros_)
         {
-            this._parametros_.parent(null);
+            e.parent(null);
         }
+        this._parametros_.clear();
 
-        if(node != null)
+        for(Object obj_e : list)
         {
-            if(node.parent() != null)
+            PParametro e = (PParametro) obj_e;
+            if(e.parent() != null)
             {
-                node.parent().removeChild(node);
+                e.parent().removeChild(e);
             }
 
-            node.parent(this);
+            e.parent(this);
+            this._parametros_.add(e);
         }
-
-        this._parametros_ = node;
     }
 
     public PBloco getBloco()
@@ -176,9 +178,8 @@ public final class AComumDecFuncao extends PDecFuncao
             return;
         }
 
-        if(this._parametros_ == child)
+        if(this._parametros_.remove(child))
         {
-            this._parametros_ = null;
             return;
         }
 
@@ -207,10 +208,22 @@ public final class AComumDecFuncao extends PDecFuncao
             return;
         }
 
-        if(this._parametros_ == oldChild)
+        for(ListIterator<PParametro> i = this._parametros_.listIterator(); i.hasNext();)
         {
-            setParametros((PParametros) newChild);
-            return;
+            if(i.next() == oldChild)
+            {
+                if(newChild != null)
+                {
+                    i.set((PParametro) newChild);
+                    newChild.parent(this);
+                    oldChild.parent(null);
+                    return;
+                }
+
+                i.remove();
+                oldChild.parent(null);
+                return;
+            }
         }
 
         if(this._bloco_ == oldChild)

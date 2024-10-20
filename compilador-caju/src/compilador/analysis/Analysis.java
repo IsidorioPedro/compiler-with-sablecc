@@ -16,8 +16,6 @@ public interface Analysis extends Switch
     void caseADecVariavelDecVariavel(ADecVariavelDecVariavel node);
     void caseAComumDecFuncao(AComumDecFuncao node);
     void caseAInicialDecFuncao(AInicialDecFuncao node);
-    void caseAParamParametros(AParamParametros node);
-    void caseAEmptyParametros(AEmptyParametros node);
     void caseAParametroParametro(AParametroParametro node);
     void caseATipoBaseTipo(ATipoBaseTipo node);
     void caseATipoVetorTipo(ATipoVetorTipo node);

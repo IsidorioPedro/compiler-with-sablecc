@@ -1,6 +1,7 @@
 package compilador;
 
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Deque;
 
 import java.util.Optional;
@@ -47,6 +48,34 @@ public class Semantico extends DepthFirstAdapter {
 	    {
 	        pilhaTabelaSimbolos.pop();
 	    }
+	
+	@Override
+	public void outAComumDecFuncao(AComumDecFuncao node) 
+		{
+			HashMap<String, Simbolo> tabelaDeSimbolos = pilhaTabelaSimbolos.peek();
+			List<PParametro> listaParametro = new ArrayList<>(node.getParametros());
+			Map<String, String> Parametro = new HashMap<>();
+			for (PParametro p : listaParametro) {
+				String tipo = p.toString().split(" ")[0];
+				if (tipo.equals("vetor")) {
+					String var = p.toString().split(" ")[3];
+					String parametro = String.join(" ", p.toString().split(" ")[0], p.toString().split(" ")[1], p.toString().split(" ")[2]);
+					System.out.println("Var " + parametro);
+					Parametro.put(var, parametro);
+				}else {
+					String var = p.toString().split(" ")[1];
+					String parametro = p.toString().split(" ")[0];
+					System.out.println("Var "+ parametro);
+					Parametro.put(var, parametro);
+				}
+			}
+			System.out.println("Key " + node.getId().toString());
+			System.out.println("Tipo " + node.getTipoRetorno().toString());
+			String key = node.getId().toString();
+			Simbolo simbolo = new Simbolo(node.getTipoRetorno().toString(), false);
+			simbolo.set_Map(Parametro);
+			tabelaDeSimbolos.put(key, simbolo);
+		}
 	  
 	@Override
 	public void outADecVariavelDecVariavel(ADecVariavelDecVariavel node) 

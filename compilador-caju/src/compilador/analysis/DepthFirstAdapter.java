@@ -117,9 +117,12 @@ public class DepthFirstAdapter extends AnalysisAdapter
         {
             node.getId().apply(this);
         }
-        if(node.getParametros() != null)
         {
-            node.getParametros().apply(this);
+            List<PParametro> copy = new ArrayList<PParametro>(node.getParametros());
+            for(PParametro e : copy)
+            {
+                e.apply(this);
+            }
         }
         if(node.getBloco() != null)
         {
@@ -150,31 +153,6 @@ public class DepthFirstAdapter extends AnalysisAdapter
         {
             node.getId().apply(this);
         }
-        if(node.getParametros() != null)
-        {
-            node.getParametros().apply(this);
-        }
-        if(node.getBloco() != null)
-        {
-            node.getBloco().apply(this);
-        }
-        outAInicialDecFuncao(node);
-    }
-
-    public void inAParamParametros(AParamParametros node)
-    {
-        defaultIn(node);
-    }
-
-    public void outAParamParametros(AParamParametros node)
-    {
-        defaultOut(node);
-    }
-
-    @Override
-    public void caseAParamParametros(AParamParametros node)
-    {
-        inAParamParametros(node);
         {
             List<PParametro> copy = new ArrayList<PParametro>(node.getParametros());
             for(PParametro e : copy)
@@ -182,24 +160,11 @@ public class DepthFirstAdapter extends AnalysisAdapter
                 e.apply(this);
             }
         }
-        outAParamParametros(node);
-    }
-
-    public void inAEmptyParametros(AEmptyParametros node)
-    {
-        defaultIn(node);
-    }
-
-    public void outAEmptyParametros(AEmptyParametros node)
-    {
-        defaultOut(node);
-    }
-
-    @Override
-    public void caseAEmptyParametros(AEmptyParametros node)
-    {
-        inAEmptyParametros(node);
-        outAEmptyParametros(node);
+        if(node.getBloco() != null)
+        {
+            node.getBloco().apply(this);
+        }
+        outAInicialDecFuncao(node);
     }
 
     public void inAParametroParametro(AParametroParametro node)
@@ -262,6 +227,10 @@ public class DepthFirstAdapter extends AnalysisAdapter
     public void caseATipoVetorTipo(ATipoVetorTipo node)
     {
         inATipoVetorTipo(node);
+        if(node.getTipoVetor() != null)
+        {
+            node.getTipoVetor().apply(this);
+        }
         if(node.getTipoBase() != null)
         {
             node.getTipoBase().apply(this);

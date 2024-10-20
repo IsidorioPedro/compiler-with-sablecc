@@ -10,7 +10,7 @@ public class Main
  {
   try
   {
-   String arquivo = "test/teste.cj";
+   String arquivo = "test/insertion-sort.cj";
   
    Parser p =
     new Parser(
@@ -20,7 +20,7 @@ public class Main
    
    Start tree = p.parse();
 
-   tree.apply(new ASTPrinter());
+   tree.apply(new ASTDisplay());
    
    //aplicação da análise semântica em minha AST
    tree.apply(new Semantico());

@@ -8,6 +8,7 @@ import compilador.analysis.*;
 @SuppressWarnings("nls")
 public final class ATipoVetorTipo extends PTipo
 {
+    private TTipoVetor _tipoVetor_;
     private PTipoBase _tipoBase_;
     private final LinkedList<PExp> _exp_ = new LinkedList<PExp>();
 
@@ -17,10 +18,13 @@ public final class ATipoVetorTipo extends PTipo
     }
 
     public ATipoVetorTipo(
+        @SuppressWarnings("hiding") TTipoVetor _tipoVetor_,
         @SuppressWarnings("hiding") PTipoBase _tipoBase_,
         @SuppressWarnings("hiding") List<?> _exp_)
     {
         // Constructor
+        setTipoVetor(_tipoVetor_);
+
         setTipoBase(_tipoBase_);
 
         setExp(_exp_);
@@ -31,6 +35,7 @@ public final class ATipoVetorTipo extends PTipo
     public Object clone()
     {
         return new ATipoVetorTipo(
+            cloneNode(this._tipoVetor_),
             cloneNode(this._tipoBase_),
             cloneList(this._exp_));
     }
@@ -39,6 +44,31 @@ public final class ATipoVetorTipo extends PTipo
     public void apply(Switch sw)
     {
         ((Analysis) sw).caseATipoVetorTipo(this);
+    }
+
+    public TTipoVetor getTipoVetor()
+    {
+        return this._tipoVetor_;
+    }
+
+    public void setTipoVetor(TTipoVetor node)
+    {
+        if(this._tipoVetor_ != null)
+        {
+            this._tipoVetor_.parent(null);
+        }
+
+        if(node != null)
+        {
+            if(node.parent() != null)
+            {
+                node.parent().removeChild(node);
+            }
+
+            node.parent(this);
+        }
+
+        this._tipoVetor_ = node;
     }
 
     public PTipoBase getTipoBase()
@@ -96,6 +126,7 @@ public final class ATipoVetorTipo extends PTipo
     public String toString()
     {
         return ""
+            + toString(this._tipoVetor_)
             + toString(this._tipoBase_)
             + toString(this._exp_);
     }
@@ -104,6 +135,12 @@ public final class ATipoVetorTipo extends PTipo
     void removeChild(@SuppressWarnings("unused") Node child)
     {
         // Remove child
+        if(this._tipoVetor_ == child)
+        {
+            this._tipoVetor_ = null;
+            return;
+        }
+
         if(this._tipoBase_ == child)
         {
             this._tipoBase_ = null;
@@ -122,6 +159,12 @@ public final class ATipoVetorTipo extends PTipo
     void replaceChild(@SuppressWarnings("unused") Node oldChild, @SuppressWarnings("unused") Node newChild)
     {
         // Replace child
+        if(this._tipoVetor_ == oldChild)
+        {
+            setTipoVetor((TTipoVetor) newChild);
+            return;
+        }
+
         if(this._tipoBase_ == oldChild)
         {
             setTipoBase((PTipoBase) newChild);

@@ -116,9 +116,13 @@ public class ReversedDepthFirstAdapter extends AnalysisAdapter
         {
             node.getBloco().apply(this);
         }
-        if(node.getParametros() != null)
         {
-            node.getParametros().apply(this);
+            List<PParametro> copy = new ArrayList<PParametro>(node.getParametros());
+            Collections.reverse(copy);
+            for(PParametro e : copy)
+            {
+                e.apply(this);
+            }
         }
         if(node.getId() != null)
         {
@@ -149,9 +153,13 @@ public class ReversedDepthFirstAdapter extends AnalysisAdapter
         {
             node.getBloco().apply(this);
         }
-        if(node.getParametros() != null)
         {
-            node.getParametros().apply(this);
+            List<PParametro> copy = new ArrayList<PParametro>(node.getParametros());
+            Collections.reverse(copy);
+            for(PParametro e : copy)
+            {
+                e.apply(this);
+            }
         }
         if(node.getId() != null)
         {
@@ -162,48 +170,6 @@ public class ReversedDepthFirstAdapter extends AnalysisAdapter
             node.getTipoRetorno().apply(this);
         }
         outAInicialDecFuncao(node);
-    }
-
-    public void inAParamParametros(AParamParametros node)
-    {
-        defaultIn(node);
-    }
-
-    public void outAParamParametros(AParamParametros node)
-    {
-        defaultOut(node);
-    }
-
-    @Override
-    public void caseAParamParametros(AParamParametros node)
-    {
-        inAParamParametros(node);
-        {
-            List<PParametro> copy = new ArrayList<PParametro>(node.getParametros());
-            Collections.reverse(copy);
-            for(PParametro e : copy)
-            {
-                e.apply(this);
-            }
-        }
-        outAParamParametros(node);
-    }
-
-    public void inAEmptyParametros(AEmptyParametros node)
-    {
-        defaultIn(node);
-    }
-
-    public void outAEmptyParametros(AEmptyParametros node)
-    {
-        defaultOut(node);
-    }
-
-    @Override
-    public void caseAEmptyParametros(AEmptyParametros node)
-    {
-        inAEmptyParametros(node);
-        outAEmptyParametros(node);
     }
 
     public void inAParametroParametro(AParametroParametro node)
@@ -277,6 +243,10 @@ public class ReversedDepthFirstAdapter extends AnalysisAdapter
         if(node.getTipoBase() != null)
         {
             node.getTipoBase().apply(this);
+        }
+        if(node.getTipoVetor() != null)
+        {
+            node.getTipoVetor().apply(this);
         }
         outATipoVetorTipo(node);
     }

@@ -116,7 +116,7 @@ Productions
 	
     tipo {-> tipo} = 
         {base} tipo_base {-> New tipo.tipo_base(tipo_base)} |
-        {vetor} tipo_vetor tipo_base exp_entre_colchetes+ {-> New tipo.tipo_vetor(tipo_base, [exp_entre_colchetes.exp])};
+        {vetor} tipo_vetor tipo_base exp_entre_colchetes+ {-> New tipo.tipo_vetor(tipo_vetor, tipo_base, [exp_entre_colchetes.exp])};
 
     exp_entre_colchetes {-> exp} = 
         abre_colchete exp fecha_colchete {-> exp};
@@ -127,22 +127,16 @@ Productions
         {booleano} tipo_booleano {-> New tipo_base.booleano(tipo_booleano)};
 
     dec_funcao {-> dec_funcao} = 
-        {funcao} tipo_retorno id abre_parentese parametros fecha_parentese bloco {-> New dec_funcao.comum(tipo_retorno, id, parametros, bloco)} | 
-        {funcao_incial} inicio_execucao tipo_retorno id abre_parentese parametros fecha_parentese bloco {-> New dec_funcao.inicial(tipo_retorno, id, parametros, bloco)};
+        {funcao} tipo_retorno id abre_parentese parametro* fecha_parentese bloco {-> New dec_funcao.comum(tipo_retorno, id, [parametro.parametro], bloco)} | 
+        {funcao_incial} inicio_execucao tipo_retorno id abre_parentese parametro* fecha_parentese bloco {-> New dec_funcao.inicial(tipo_retorno, id, [parametro.parametro], bloco)};
 
     tipo_retorno {-> tipo_retorno} = 
         {nao_vazio} tipo {-> New tipo_retorno.nao_vazio(tipo)} |
         {vazio} tipo_vazio {-> New tipo_retorno.vazio(tipo_vazio)};
 
     parametro {-> parametro} = 
-        tipo id {-> New parametro.parametro(tipo, id)};
-
-    parametros {-> parametros} = 
-        {param} parametro multiplos_parametros* {-> New parametros.param([parametro.parametro, multiplos_parametros.parametro])} |
-        {empty} {-> New parametros.empty()};
-
-    multiplos_parametros {-> parametro} = 
-        barra_reta parametro {-> parametro.parametro};
+        {unico} tipo id {-> New parametro.parametro(tipo, id)} |
+        {multiplo} barra_reta parametro {-> parametro};
 
     bloco {-> bloco} = 
         inicio dec_variavel* comando* fim {-> New bloco.bloco([dec_variavel], [comando])};
@@ -236,18 +230,14 @@ Abstract Syntax Tree
 	dec_variavel = {dec_variavel} tipo [lista_nomes]:var+;
 	
 	dec_funcao = 
-        {comum} tipo_retorno id parametros bloco | 
-        {inicial} tipo_retorno id parametros bloco;
-
-    parametros = 
-        {param} [parametros]:parametro+ | 
-        {empty};
+        {comum} tipo_retorno id [parametros]:parametro* bloco | 
+        {inicial} tipo_retorno id [parametros]:parametro* bloco;
 
     parametro = {parametro} tipo id;
 
     tipo = 
         {tipo_base} tipo_base | 
-        {tipo_vetor} tipo_base exp+;     
+        {tipo_vetor} tipo_vetor tipo_base exp+;     
 
     tipo_base = 
         {numero} tipo_numero | 

@@ -99,18 +99,6 @@ public class AnalysisAdapter implements Analysis
     }
 
     @Override
-    public void caseAParamParametros(AParamParametros node)
-    {
-        defaultCase(node);
-    }
-
-    @Override
-    public void caseAEmptyParametros(AEmptyParametros node)
-    {
-        defaultCase(node);
-    }
-
-    @Override
     public void caseAParametroParametro(AParametroParametro node)
     {
         defaultCase(node);
