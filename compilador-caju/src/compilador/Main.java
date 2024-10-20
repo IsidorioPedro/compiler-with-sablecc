@@ -10,19 +10,21 @@ public class Main
  {
   try
   {
-   String arquivo = "test/teste.cj";
+   String arquivo = "test/insertion-sort.cj";
   
-   Lexer lex = new Lexer(
-		    new PushbackReader(  
-		    new FileReader(arquivo), 1024));
-   
-   Parser p = new Parser(lex); 
+   Parser p =
+    new Parser(
+    new Lexer(
+    new PushbackReader(  
+    new FileReader(arquivo), 1024))); 
    
    Start tree = p.parse();
-   //Imprime árvore na saída padrão
-   tree.apply(new ASTPrinter());
-   //Imprime árvore em interface gráfica
-   //tree.apply(new ASTDisplay());
+
+   tree.apply(new ASTDisplay());
+   
+   //aplicação da análise semântica em minha AST
+   tree.apply(new Semantico());
+   
   }
   catch(Exception e)
   {

@@ -1,14 +1,11 @@
-vazio {vetor numero[] array, numero tamanho} {exibirVetor}
-
-vazio troca(numero *x | numero *y)
+vazio troca(numero x | numero y)
 inicio
-    numero temporario := *x.
-    *x := *y.
-    *y := temporario.
+    numero temporario.
+    temporario := x.
 fim
 
 
-vazio bubbleSort(vetor numero[] array | numero n) 
+vazio bubbleSort(vetor numero[2] array | numero n) 
 inicio
     numero i, j.
     para (i := 0; i < n-1; i := i + 1)
@@ -17,7 +14,7 @@ inicio
                 inicio
                     se (array[j] > array[j+1])
                         inicio
-                            troca(&array[j] | &array[j+1]).
+                            troca(array[j] | array[j+1]).
                         fim
                 fim
         fim
@@ -25,8 +22,10 @@ fim
 
 -> vazio main()
 inicio
-    vetor numero[7] lista := {0,99,55,12,33,45,19}.
-    numero n := 7.
+    vetor numero [7] lista.
+    numero n.
+    n := 7.
+    lista := (12).
     exibir("Array original: \n").
     exibirVetor(lista | n).
 
@@ -36,7 +35,7 @@ inicio
 fim
 
 
-vazio exibirVetor(vetor numero[] array | numero tamanho)
+vazio exibirVetor(vetor numero [2] array | numero tamanho)
 inicio
     numero i.
     para (i := 0; i < tamanho; i := i + 1)
