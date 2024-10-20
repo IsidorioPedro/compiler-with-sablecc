@@ -1,78 +1,78 @@
 package compilador;
 
+import java.util.HashMap;
+import java.util.Deque;
+
+import java.util.Optional;
+
+import java.util.ArrayDeque;
 import java.util.ArrayList;
+
 import java.util.List;
 
 import compilador.analysis.*;
 import compilador.node.*;
 
-// Nesta classe eu defino as ações de acordo com os nós, sobrescrevendo 
-// os métodos da classe DepthFirstAdapter quando necessário.
-// Evitem dar override nos métodos caseXXX. Caso precisem, garantam que
-// os comandos de acesso aos nós filhos não são apagados nem que
-// tenham sua ordem de chamada invertida.
 public class Semantico extends DepthFirstAdapter {
-	
-	private HashPilha<String, String> tabelaDeSimbolos = new HashPilha<>(100);
+
+	private Deque<HashMap<String, Simbolo>> pilhaTabelaSimbolos = new ArrayDeque<>();
 	
 	@Override
 	public void inStart(Start node)
 	    {
 		   System.out.println("-------------------------------------------------");
 		   System.out.println("Iniciando análise semântica...");
+		   HashMap<String, Simbolo> tabelaDeSimbolos =  new HashMap<String, Simbolo>();
+		   pilhaTabelaSimbolos.push(tabelaDeSimbolos);
 	    }
 	
-	 @Override
-	 public void outStart(Start node)
+	@Override
+	public void outStart(Start node)
 	    {
-		 	tabelaDeSimbolos.printf();
 		    System.out.println("-------------------------------------------------");
 	        System.out.println("Fim da análise semântica");
-	        System.out.println("-------------------------------------------------");
-			  
+	        System.out.println("-------------------------------------------------");  
 	    }
 	 
-	 
-	 @Override
-	 public void outADecVariavelDecVariavel(ADecVariavelDecVariavel node)
+	@Override
+	public void inABlocoBloco(ABlocoBloco node) 
 	    {
-		 //O nó atual (node) tem dois filhos: tipo (node.getTipo) 
-		 //e uma lista de ids (node.getIdentificadores()). 
-		 //Olhem o arquivo com a classe do nó quando precisarem saber 
-		 //quais são os filhos possíveis.
-		 //Neste caso, as informações estão em ADeclaracoesDeclaracao.java 
-		 
-		 
-		 // node.getTipo é do tipo abstrato PTipo. Quando precisarem identificar 
-		 // que instância de um nó está sendo usada, vocês
-		 // devem verificar quem são as filhas dela no pacote tipo.node
-		 // Neste exemplo, node.getTipo pode ser uma instância de TReal ou 
-		 // de TInteiro.		 
-		  System.out.println("-------------------------------------------------");
-		  System.out.println("O tipo desta declaração é " + node.getTipo());
+		    HashMap<String, Simbolo> tabelaDeSimbolosTopo = pilhaTabelaSimbolos.peek();   
 		  
-		  
-		  
-		  //node.getIdentificadores é a lista de nome de veriáveis. Ela é uma lista porque eu 
-		  //a defini desta maneira na minha gramática abstrata.
-		  System.out.print("Variáveis: ");
-		  List<PVar> copy = new ArrayList<PVar>(node.getListaNomes());
-          for(PVar e : copy)
-          {
-        	  //e contém o token associado a cada var da lista. 
-              System.out.print(e.toString());
-          } 
-          System.out.println();
-          System.out.println("Ações a serem tomadas na tabela de símbolos:");
-          for(PVar e : copy)
-          {
-        	  String id = e.toString();
-        	  String tipo = node.getTipo().toString();
-        	  tabelaDeSimbolos.put(id, tipo);
-              System.out.println("-->Inserir ( "+ e.toString()+", " +node.getTipo()+")");
-          }
+		    pilhaTabelaSimbolos.push(new HashMap<>(tabelaDeSimbolosTopo));
 	    }
-	 
 
-	 
+	@Override
+	public void outABlocoBloco(ABlocoBloco node) 
+	    {
+	        pilhaTabelaSimbolos.pop();
+	    }
+	  
+	@Override
+	public void outADecVariavelDecVariavel(ADecVariavelDecVariavel node) 
+	    {
+	        HashMap<String, Simbolo> tabelaDeSimbolos = pilhaTabelaSimbolos.peek();
+	        List<PVar> listaVariaveis = new ArrayList<>(node.getListaNomes());
+
+	        for (PVar v : listaVariaveis) {
+	            String key = v.toString().split(" ")[0];
+	            Simbolo simbolo = new Simbolo(node.getTipo().toString(), false);
+	            tabelaDeSimbolos.put(key, simbolo);
+	            System.out.println(key + " de tipo " + node.getTipo().toString() + " adicionado na tabela de símbolos.");
+	        }
+	    }
+	
+	@Override
+    public void outAAtribAtrib(AAtribAtrib node) {
+        HashMap<String, Simbolo> tabelaDeSimbolos = pilhaTabelaSimbolos.peek();
+        String key = node.getVar().toString().split(" ")[0];
+
+        Optional<Simbolo> simboloOpt = Optional.ofNullable(tabelaDeSimbolos.get(key));
+        if (simboloOpt.isPresent()) {
+            Simbolo simbolo = simboloOpt.get();
+            simbolo.valor_atribuido();
+        } else {
+            System.out.println("ERRO: " + node.getVar().toString() + " não foi declarado.");
+        }
+    }
 }
