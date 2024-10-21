@@ -261,73 +261,73 @@ public class AnalysisAdapter implements Analysis
     }
 
     @Override
-    public void caseAEExp(AEExp node)
+    public void caseALogicaEExp(ALogicaEExp node)
     {
         defaultCase(node);
     }
 
     @Override
-    public void caseAOuExp(AOuExp node)
+    public void caseALogicaOuExp(ALogicaOuExp node)
     {
         defaultCase(node);
     }
 
     @Override
-    public void caseANaoExp(ANaoExp node)
+    public void caseALogicaNaoExp(ALogicaNaoExp node)
     {
         defaultCase(node);
     }
 
     @Override
-    public void caseAIgualExp(AIgualExp node)
+    public void caseARelacionalIgualExp(ARelacionalIgualExp node)
     {
         defaultCase(node);
     }
 
     @Override
-    public void caseAMenorExp(AMenorExp node)
+    public void caseARelacionalMenorExp(ARelacionalMenorExp node)
     {
         defaultCase(node);
     }
 
     @Override
-    public void caseAMaiorExp(AMaiorExp node)
+    public void caseARelacionalMaiorExp(ARelacionalMaiorExp node)
     {
         defaultCase(node);
     }
 
     @Override
-    public void caseAMenorIgualExp(AMenorIgualExp node)
+    public void caseARelacionalMenorIgualExp(ARelacionalMenorIgualExp node)
     {
         defaultCase(node);
     }
 
     @Override
-    public void caseAMaiorIgualExp(AMaiorIgualExp node)
+    public void caseARelacionalMaiorIgualExp(ARelacionalMaiorIgualExp node)
     {
         defaultCase(node);
     }
 
     @Override
-    public void caseASomaExp(ASomaExp node)
+    public void caseAAritmeticaSomaExp(AAritmeticaSomaExp node)
     {
         defaultCase(node);
     }
 
     @Override
-    public void caseASubtracaoExp(ASubtracaoExp node)
+    public void caseAAritmeticaSubtracaoExp(AAritmeticaSubtracaoExp node)
     {
         defaultCase(node);
     }
 
     @Override
-    public void caseAMultiplicacaoExp(AMultiplicacaoExp node)
+    public void caseAAritmeticaMultiplicacaoExp(AAritmeticaMultiplicacaoExp node)
     {
         defaultCase(node);
     }
 
     @Override
-    public void caseADivisaoExp(ADivisaoExp node)
+    public void caseAAritmeticaDivisaoExp(AAritmeticaDivisaoExp node)
     {
         defaultCase(node);
     }

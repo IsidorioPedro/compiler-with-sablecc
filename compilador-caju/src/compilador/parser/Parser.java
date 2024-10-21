@@ -2086,7 +2086,7 @@ public class Parser
         pexpNode2 = (PExp)nodeArrayList1.get(0);
         pexpNode3 = (PExp)nodeArrayList3.get(0);
 
-        pexpNode1 = new AEExp(pexpNode2, pexpNode3);
+        pexpNode1 = new ALogicaEExp(pexpNode2, pexpNode3);
         }
 	nodeList.add(pexpNode1);
         return nodeList;
@@ -2110,7 +2110,7 @@ public class Parser
         pexpNode2 = (PExp)nodeArrayList1.get(0);
         pexpNode3 = (PExp)nodeArrayList3.get(0);
 
-        pexpNode1 = new AOuExp(pexpNode2, pexpNode3);
+        pexpNode1 = new ALogicaOuExp(pexpNode2, pexpNode3);
         }
 	nodeList.add(pexpNode1);
         return nodeList;
@@ -2131,7 +2131,7 @@ public class Parser
         PExp pexpNode2;
         pexpNode2 = (PExp)nodeArrayList2.get(0);
 
-        pexpNode1 = new ANaoExp(pexpNode2);
+        pexpNode1 = new ALogicaNaoExp(pexpNode2);
         }
 	nodeList.add(pexpNode1);
         return nodeList;
@@ -2169,7 +2169,7 @@ public class Parser
         pexpNode2 = (PExp)nodeArrayList1.get(0);
         pexpNode3 = (PExp)nodeArrayList3.get(0);
 
-        pexpNode1 = new AIgualExp(pexpNode2, pexpNode3);
+        pexpNode1 = new ARelacionalIgualExp(pexpNode2, pexpNode3);
         }
 	nodeList.add(pexpNode1);
         return nodeList;
@@ -2193,7 +2193,7 @@ public class Parser
         pexpNode2 = (PExp)nodeArrayList1.get(0);
         pexpNode3 = (PExp)nodeArrayList3.get(0);
 
-        pexpNode1 = new AMaiorExp(pexpNode2, pexpNode3);
+        pexpNode1 = new ARelacionalMaiorExp(pexpNode2, pexpNode3);
         }
 	nodeList.add(pexpNode1);
         return nodeList;
@@ -2217,7 +2217,7 @@ public class Parser
         pexpNode2 = (PExp)nodeArrayList1.get(0);
         pexpNode3 = (PExp)nodeArrayList3.get(0);
 
-        pexpNode1 = new AMenorExp(pexpNode2, pexpNode3);
+        pexpNode1 = new ARelacionalMenorExp(pexpNode2, pexpNode3);
         }
 	nodeList.add(pexpNode1);
         return nodeList;
@@ -2241,7 +2241,7 @@ public class Parser
         pexpNode2 = (PExp)nodeArrayList1.get(0);
         pexpNode3 = (PExp)nodeArrayList3.get(0);
 
-        pexpNode1 = new AMaiorIgualExp(pexpNode2, pexpNode3);
+        pexpNode1 = new ARelacionalMaiorIgualExp(pexpNode2, pexpNode3);
         }
 	nodeList.add(pexpNode1);
         return nodeList;
@@ -2265,7 +2265,7 @@ public class Parser
         pexpNode2 = (PExp)nodeArrayList1.get(0);
         pexpNode3 = (PExp)nodeArrayList3.get(0);
 
-        pexpNode1 = new AMenorIgualExp(pexpNode2, pexpNode3);
+        pexpNode1 = new ARelacionalMenorIgualExp(pexpNode2, pexpNode3);
         }
 	nodeList.add(pexpNode1);
         return nodeList;
@@ -2303,7 +2303,7 @@ public class Parser
         pexpNode2 = (PExp)nodeArrayList1.get(0);
         pexpNode3 = (PExp)nodeArrayList3.get(0);
 
-        pexpNode1 = new ASomaExp(pexpNode2, pexpNode3);
+        pexpNode1 = new AAritmeticaSomaExp(pexpNode2, pexpNode3);
         }
 	nodeList.add(pexpNode1);
         return nodeList;
@@ -2327,7 +2327,7 @@ public class Parser
         pexpNode2 = (PExp)nodeArrayList1.get(0);
         pexpNode3 = (PExp)nodeArrayList3.get(0);
 
-        pexpNode1 = new ASubtracaoExp(pexpNode2, pexpNode3);
+        pexpNode1 = new AAritmeticaSubtracaoExp(pexpNode2, pexpNode3);
         }
 	nodeList.add(pexpNode1);
         return nodeList;
@@ -2365,7 +2365,7 @@ public class Parser
         pexpNode2 = (PExp)nodeArrayList1.get(0);
         pexpNode3 = (PExp)nodeArrayList3.get(0);
 
-        pexpNode1 = new AMultiplicacaoExp(pexpNode2, pexpNode3);
+        pexpNode1 = new AAritmeticaMultiplicacaoExp(pexpNode2, pexpNode3);
         }
 	nodeList.add(pexpNode1);
         return nodeList;
@@ -2389,7 +2389,7 @@ public class Parser
         pexpNode2 = (PExp)nodeArrayList1.get(0);
         pexpNode3 = (PExp)nodeArrayList3.get(0);
 
-        pexpNode1 = new ADivisaoExp(pexpNode2, pexpNode3);
+        pexpNode1 = new AAritmeticaDivisaoExp(pexpNode2, pexpNode3);
         }
 	nodeList.add(pexpNode1);
         return nodeList;

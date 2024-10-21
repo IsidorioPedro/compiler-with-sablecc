@@ -173,27 +173,27 @@ Productions
         {variavel} id exp_entre_colchetes+  {-> New var.variavel(id, [exp_entre_colchetes.exp])};
 	
     expressao_logica {-> exp} = 
-        {e} expressao_relacional e expressao_logica {-> New exp.e(expressao_relacional.exp, expressao_logica.exp)} |
-        {ou} expressao_relacional ou expressao_logica {-> New exp.ou(expressao_relacional.exp, expressao_logica.exp)} |
-        {nao} nao expressao_logica {-> New exp.nao(expressao_logica.exp)} |
+        {e} expressao_relacional e expressao_logica {-> New exp.logica_e(expressao_relacional.exp, expressao_logica.exp)} |
+        {ou} expressao_relacional ou expressao_logica {-> New exp.logica_ou(expressao_relacional.exp, expressao_logica.exp)} |
+        {nao} nao expressao_logica {-> New exp.logica_nao(expressao_logica.exp)} |
         {relacional} expressao_relacional {-> expressao_relacional.exp};
 
     expressao_relacional {-> exp} = 
-        {igual} [esquerda]:expressao_aritmetica igual [direita]:expressao_relacional {-> New exp.igual(esquerda.exp, direita.exp)} |
-        {maior} [esquerda]:expressao_aritmetica maior [direita]:expressao_relacional {-> New exp.maior(esquerda.exp, direita.exp)} |
-        {menor} [esquerda]:expressao_aritmetica menor [direita]:expressao_relacional {-> New exp.menor(esquerda.exp, direita.exp)} |
-        {maior_igual} [esquerda]:expressao_aritmetica maior_igual [direita]:expressao_relacional {-> New exp.maior_igual(esquerda.exp, direita.exp)} |
-        {menor_igual} [esquerda]:expressao_aritmetica menor_igual [direita]:expressao_relacional {-> New exp.menor_igual(esquerda.exp, direita.exp)} |
+        {igual} [esquerda]:expressao_aritmetica igual [direita]:expressao_relacional {-> New exp.relacional_igual(esquerda.exp, direita.exp)} |
+        {maior} [esquerda]:expressao_aritmetica maior [direita]:expressao_relacional {-> New exp.relacional_maior(esquerda.exp, direita.exp)} |
+        {menor} [esquerda]:expressao_aritmetica menor [direita]:expressao_relacional {-> New exp.relacional_menor(esquerda.exp, direita.exp)} |
+        {maior_igual} [esquerda]:expressao_aritmetica maior_igual [direita]:expressao_relacional {-> New exp.relacional_maior_igual(esquerda.exp, direita.exp)} |
+        {menor_igual} [esquerda]:expressao_aritmetica menor_igual [direita]:expressao_relacional {-> New exp.relacional_menor_igual(esquerda.exp, direita.exp)} |
         {aritmetica} expressao_aritmetica {-> expressao_aritmetica.exp};
 
     expressao_aritmetica {-> exp} = 
-        {soma} termo_aritmetico mais expressao_aritmetica {-> New exp.soma(termo_aritmetico.exp, expressao_aritmetica.exp)} |
-        {subtracao} termo_aritmetico menos expressao_aritmetica {-> New exp.subtracao(termo_aritmetico.exp, expressao_aritmetica.exp)} |
+        {soma} termo_aritmetico mais expressao_aritmetica {-> New exp.aritmetica_soma(termo_aritmetico.exp, expressao_aritmetica.exp)} |
+        {subtracao} termo_aritmetico menos expressao_aritmetica {-> New exp.aritmetica_subtracao(termo_aritmetico.exp, expressao_aritmetica.exp)} |
         {termo} termo_aritmetico {-> termo_aritmetico.exp};
 
     termo_aritmetico {-> exp} = 
-        {multiplicacao} fator_aritmetico multiplicacao termo_aritmetico {-> New exp.multiplicacao(fator_aritmetico.exp, termo_aritmetico.exp)} |
-        {divisao} fator_aritmetico divisao termo_aritmetico {-> New exp.divisao(fator_aritmetico.exp, termo_aritmetico.exp)} |
+        {multiplicacao} fator_aritmetico multiplicacao termo_aritmetico {-> New exp.aritmetica_multiplicacao(fator_aritmetico.exp, termo_aritmetico.exp)} |
+        {divisao} fator_aritmetico divisao termo_aritmetico {-> New exp.aritmetica_divisao(fator_aritmetico.exp, termo_aritmetico.exp)} |
         {fator} fator_aritmetico {-> fator_aritmetico.exp};
 
     fator_aritmetico {-> exp} = 
@@ -280,18 +280,18 @@ Abstract Syntax Tree
         {negativo} numero;
 
     exp = 
-        {e} [esquerda]:exp [direita]:exp | 
-        {ou} [esquerda]:exp [direita]:exp | 
-        {nao} exp |
-        {igual} [esquerda]:exp [direita]:exp | 
-        {menor} [esquerda]:exp [direita]:exp | 
-        {maior} [esquerda]:exp [direita]:exp | 
-        {menor_igual} [esquerda]:exp [direita]:exp | 
-        {maior_igual} [esquerda]:exp [direita]:exp | 
-        {soma} [esquerda]:exp [direita]:exp | 
-        {subtracao} [esquerda]:exp [direita]:exp | 
-        {multiplicacao} [esquerda]:exp [direita]:exp | 
-        {divisao} [esquerda]:exp [direita]:exp | 
+        {logica_e} [esquerda]:exp [direita]:exp | 
+        {logica_ou} [esquerda]:exp [direita]:exp | 
+        {logica_nao} exp |
+        {relacional_igual} [esquerda]:exp [direita]:exp | 
+        {relacional_menor} [esquerda]:exp [direita]:exp | 
+        {relacional_maior} [esquerda]:exp [direita]:exp | 
+        {relacional_menor_igual} [esquerda]:exp [direita]:exp | 
+        {relacional_maior_igual} [esquerda]:exp [direita]:exp | 
+        {aritmetica_soma} [esquerda]:exp [direita]:exp | 
+        {aritmetica_subtracao} [esquerda]:exp [direita]:exp | 
+        {aritmetica_multiplicacao} [esquerda]:exp [direita]:exp | 
+        {aritmetica_divisao} [esquerda]:exp [direita]:exp | 
         {variavel} var | 
         {numero} numero_com_sinal  | 
         {booleano} booleano | 

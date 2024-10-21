@@ -24,4 +24,17 @@ public class Simbolo {
 	    public void valor_atribuido() {
 	        atribuido = true;
 	    }
+	    
+	    public String get_tipo() {
+	    	return this.tipo;
+	    }
+	    
+	    @Override
+	    public String toString() {
+	        return "Simbolo{" +
+	                "tipo='" + tipo + '\'' +
+	                ", atribuido=" + atribuido +
+	                ", parametro=" + parametro +
+	                '}';
+	    }
 }

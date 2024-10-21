@@ -5,17 +5,17 @@ package compilador.node;
 import compilador.analysis.*;
 
 @SuppressWarnings("nls")
-public final class AMaiorExp extends PExp
+public final class ALogicaEExp extends PExp
 {
     private PExp _esquerda_;
     private PExp _direita_;
 
-    public AMaiorExp()
+    public ALogicaEExp()
     {
         // Constructor
     }
 
-    public AMaiorExp(
+    public ALogicaEExp(
         @SuppressWarnings("hiding") PExp _esquerda_,
         @SuppressWarnings("hiding") PExp _direita_)
     {
@@ -29,7 +29,7 @@ public final class AMaiorExp extends PExp
     @Override
     public Object clone()
     {
-        return new AMaiorExp(
+        return new ALogicaEExp(
             cloneNode(this._esquerda_),
             cloneNode(this._direita_));
     }
@@ -37,7 +37,7 @@ public final class AMaiorExp extends PExp
     @Override
     public void apply(Switch sw)
     {
-        ((Analysis) sw).caseAMaiorExp(this);
+        ((Analysis) sw).caseALogicaEExp(this);
     }
 
     public PExp getEsquerda()

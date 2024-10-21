@@ -5,17 +5,17 @@ package compilador.node;
 import compilador.analysis.*;
 
 @SuppressWarnings("nls")
-public final class ASomaExp extends PExp
+public final class AAritmeticaDivisaoExp extends PExp
 {
     private PExp _esquerda_;
     private PExp _direita_;
 
-    public ASomaExp()
+    public AAritmeticaDivisaoExp()
     {
         // Constructor
     }
 
-    public ASomaExp(
+    public AAritmeticaDivisaoExp(
         @SuppressWarnings("hiding") PExp _esquerda_,
         @SuppressWarnings("hiding") PExp _direita_)
     {
@@ -29,7 +29,7 @@ public final class ASomaExp extends PExp
     @Override
     public Object clone()
     {
-        return new ASomaExp(
+        return new AAritmeticaDivisaoExp(
             cloneNode(this._esquerda_),
             cloneNode(this._direita_));
     }
@@ -37,7 +37,7 @@ public final class ASomaExp extends PExp
     @Override
     public void apply(Switch sw)
     {
-        ((Analysis) sw).caseASomaExp(this);
+        ((Analysis) sw).caseAAritmeticaDivisaoExp(this);
     }
 
     public PExp getEsquerda()

@@ -5,17 +5,17 @@ package compilador.node;
 import compilador.analysis.*;
 
 @SuppressWarnings("nls")
-public final class AMenorExp extends PExp
+public final class ARelacionalMenorExp extends PExp
 {
     private PExp _esquerda_;
     private PExp _direita_;
 
-    public AMenorExp()
+    public ARelacionalMenorExp()
     {
         // Constructor
     }
 
-    public AMenorExp(
+    public ARelacionalMenorExp(
         @SuppressWarnings("hiding") PExp _esquerda_,
         @SuppressWarnings("hiding") PExp _direita_)
     {
@@ -29,7 +29,7 @@ public final class AMenorExp extends PExp
     @Override
     public Object clone()
     {
-        return new AMenorExp(
+        return new ARelacionalMenorExp(
             cloneNode(this._esquerda_),
             cloneNode(this._direita_));
     }
@@ -37,7 +37,7 @@ public final class AMenorExp extends PExp
     @Override
     public void apply(Switch sw)
     {
-        ((Analysis) sw).caseAMenorExp(this);
+        ((Analysis) sw).caseARelacionalMenorExp(this);
     }
 
     public PExp getEsquerda()

@@ -5,16 +5,16 @@ package compilador.node;
 import compilador.analysis.*;
 
 @SuppressWarnings("nls")
-public final class ANaoExp extends PExp
+public final class ALogicaNaoExp extends PExp
 {
     private PExp _exp_;
 
-    public ANaoExp()
+    public ALogicaNaoExp()
     {
         // Constructor
     }
 
-    public ANaoExp(
+    public ALogicaNaoExp(
         @SuppressWarnings("hiding") PExp _exp_)
     {
         // Constructor
@@ -25,14 +25,14 @@ public final class ANaoExp extends PExp
     @Override
     public Object clone()
     {
-        return new ANaoExp(
+        return new ALogicaNaoExp(
             cloneNode(this._exp_));
     }
 
     @Override
     public void apply(Switch sw)
     {
-        ((Analysis) sw).caseANaoExp(this);
+        ((Analysis) sw).caseALogicaNaoExp(this);
     }
 
     public PExp getExp()

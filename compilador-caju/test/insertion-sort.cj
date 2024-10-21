@@ -4,7 +4,9 @@ numero a.
 vazio insertionSort(vetor numero [2] lista | numero n)
 inicio
     numero i, j, chave.
-
+    caractere k.
+	
+	k := 'a'.
     i := 1.
     enquanto (i < n)
     inicio
