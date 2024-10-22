@@ -116,7 +116,7 @@ public class Semantico extends DepthFirstAdapter {
 				}
 			}
 			System.out.println("Key " + node.getId().toString());
-			System.out.println("Tipo " + node.getTipoRetorno().toString());
+			// System.out.println("Tipo " + node.getTipoRetorno().toString());
 			String key = node.getId().toString().split(" ")[0];
 			Simbolo simbolo = new Simbolo(node.getTipoRetorno().toString(), false);
 			simbolo.set_Map(Parametro);
@@ -226,15 +226,7 @@ public class Semantico extends DepthFirstAdapter {
             if (simbolo.get_tipo().equals("numero ") || simbolo.get_tipo().toString().contains("vetor numero") ) {
             	String[] exps = node.getExp().toString().trim().split(" ");
             	String nomeDaExpressao = node.getExp().getClass().getSimpleName().toString();
-            	if ( !nomeDaExpressao.contains("ALogica") && !nomeDaExpressao.contains("ARelacional")) {
-            		if( exps.length >= 1) {
-                		for (String exp : exps) {
-                			if (!verificaTipagem(tabelaDeSimbolos, exp, "numero")) {
-                				System.out.println("A atribuição para a variavel: " + key + " .Não é um numero");
-                			}
-                		}
-                	}
-            	}else {
+            	if ( nomeDaExpressao.contains("ALogica") || nomeDaExpressao.contains("ARelacional")) {
             		System.out.println("A atribuição para a variavel: " + key + " . Não é expressão aritmetica");
             	}
             }
@@ -242,16 +234,12 @@ public class Semantico extends DepthFirstAdapter {
             if (simbolo.get_tipo().equals("caractere ") || simbolo.get_tipo().toString().contains("vetor caractere") ) {
             	String[] exps = node.getExp().toString().trim().split(" ");
             	String nomeDaExpressao = node.getExp().getClass().getSimpleName().toString();
-            	if ( !nomeDaExpressao.contains("ALogica") && !nomeDaExpressao.contains("ARelacional")) {
-            		if( exps.length >= 1) {
-                		for (String exp : exps) {
-                			if (!verificaTipagem(tabelaDeSimbolos, exp, "caractere")) {
-                				System.out.println("A atribuição para a variavel: " + key + " .Não é um caractere");
-                			}
-                		}
-                	}
-            	}else {
+            	if ( nomeDaExpressao.contains("ALogica") || nomeDaExpressao.contains("ARelacional")) {
             		System.out.println("A atribuição para a variavel: " + key + " . Não é expressao aritmetica");
+            	}else {
+            		if ( !nomeDaExpressao.contains("AAritmeticaSomaExp") && !nomeDaExpressao.contains("ACaractere")) {
+            			System.out.println("A atribuição para a variavel: " + key + " .Não é operação de concatenação ou expressão de caractere");
+            		}
             	}
             }
             // Caso a variavel for um booleano
@@ -259,14 +247,6 @@ public class Semantico extends DepthFirstAdapter {
             	String[] exps = node.getExp().toString().trim().split(" ");
             	String nomeDaExpressao = node.getExp().getClass().getSimpleName().toString();
             	if ( !nomeDaExpressao.contains("AAritmetica") ) {
-            		if( exps.length >= 1) {
-                		for (String exp : exps) {
-                			if (!verificaTipagem(tabelaDeSimbolos, exp, "booleano")) {
-                				System.out.println("A atribuição para a variavel: " + key + " .Não é um booleano");
-                			}
-                		}
-                	}
-            	}else {
             		System.out.println("A atribuição para a variavel: " + key + " . Nem é expressão logica ou relacional");
             	}
             }
@@ -280,7 +260,7 @@ public class Semantico extends DepthFirstAdapter {
     public void outAAtribAtrib(AAtribAtrib node) {
         HashMap<String, Simbolo> tabelaDeSimbolos = pilhaTabelaSimbolos.peek();
         String[] key = node.getVar().toString().split(" ");
-        System.out.println("Key: " + key[0]);
+        // System.out.println("Key: " + key[0]);
         /*
          * Não consigo sabe se dentro do colchete é uma expressão aritmetica ou não...
         */
@@ -293,4 +273,198 @@ public class Semantico extends DepthFirstAdapter {
         }
         auxAtrib(tabelaDeSimbolos, key[0], node);
     }
+	
+	@Override
+	public void outAChamadaChamada(AChamadaChamada node) {
+		HashMap<String,Simbolo> tabelaDeSimbolos = pilhaTabelaSimbolos.peek();
+		String key = node.getId().toString().split(" ")[0];
+		String[] vars = node.getListaExp().toString().split(" ");
+		if (tabelaDeSimbolos.containsKey(key)) {
+			Simbolo simbolo = tabelaDeSimbolos.get(key);
+			Map<String,String> map = new HashMap<>(simbolo.get_Map());
+			
+			List<String> keys = new ArrayList<>(map.keySet());
+	        List<String> values = new ArrayList<>(map.values());
+
+	        // Iterando usando um loop for com índice
+	        for (int i = 0; i < keys.size(); i++) {
+	            String chave = keys.get(i);
+	            String valor = values.get(i);
+	            if (tabelaDeSimbolos.containsKey(vars[i])) {
+	            	Simbolo simInfo = tabelaDeSimbolos.get(vars[i]);
+	            	String tipo = simInfo.get_tipo();
+	            	if (!tipo.equals(valor + " ")) {
+	            		System.out.println("Na chamada de função: " + key + " .A variavel " + vars[i] + " não é do tipo: " + tipo);
+	            	}
+	            }else {
+	            	System.out.println("A variavel: " + vars[i] + " não foi declarada");
+	            }
+	        }
+		}else {
+			System.out.println("A função: " + key + " não foi encontrado");
+		}
+	}
+	
+	
+	@Override
+	public void outAAritmeticaSomaExp(AAritmeticaSomaExp node) {
+		System.out.println("Key: " + node.getDireita() + " " + node.getEsquerda());
+		HashMap<String,Simbolo> tabelaDeSimbolos = pilhaTabelaSimbolos.peek();
+		if (!verificaTipagem(tabelaDeSimbolos, node.getDireita().toString().split(" ")[0], "numero")) {
+			System.out.println(node.getDireita() + " não é do tipo numero");
+		}else {
+			if (!verificaTipagem(tabelaDeSimbolos, node.getEsquerda().toString().split(" ")[0], "numero")) {
+				System.out.println(node.getEsquerda() + " não é do tipo numero");
+			}
+		}
+	}
+	
+	@Override
+	public void outAAritmeticaSubtracaoExp(AAritmeticaSubtracaoExp node) {
+		System.out.println("Key: " + node.getDireita() + " " + node.getEsquerda());
+		HashMap<String,Simbolo> tabelaDeSimbolos = pilhaTabelaSimbolos.peek();
+		if (!verificaTipagem(tabelaDeSimbolos, node.getDireita().toString().split(" ")[0], "numero")) {
+			System.out.println(node.getDireita() + " não é do tipo numero");
+		}else {
+			if (!verificaTipagem(tabelaDeSimbolos, node.getEsquerda().toString().split(" ")[0], "numero")) {
+				System.out.println(node.getEsquerda() + " não é do tipo numero");
+			}
+		}
+	}
+	
+	@Override
+	public void outAAritmeticaMultiplicacaoExp(AAritmeticaMultiplicacaoExp node) {
+		System.out.println("Key: " + node.getDireita() + " " + node.getEsquerda());
+		HashMap<String,Simbolo> tabelaDeSimbolos = pilhaTabelaSimbolos.peek();
+		if (!verificaTipagem(tabelaDeSimbolos, node.getDireita().toString().split(" ")[0], "numero")) {
+			System.out.println(node.getDireita() + " não é do tipo numero");
+		}else {
+			if (!verificaTipagem(tabelaDeSimbolos, node.getEsquerda().toString().split(" ")[0], "numero")) {
+				System.out.println(node.getEsquerda() + " não é do tipo numero");
+			}
+		}
+	}
+	
+	@Override
+	public void outAAritmeticaDivisaoExp(AAritmeticaDivisaoExp node) {
+		System.out.println("Key: " + node.getDireita() + " " + node.getEsquerda());
+		HashMap<String,Simbolo> tabelaDeSimbolos = pilhaTabelaSimbolos.peek();
+		if (!verificaTipagem(tabelaDeSimbolos, node.getDireita().toString().split(" ")[0], "numero")) {
+			System.out.println(node.getDireita() + " não é do tipo numero");
+		}else {
+			if (!verificaTipagem(tabelaDeSimbolos, node.getEsquerda().toString().split(" ")[0], "numero")) {
+				System.out.println(node.getEsquerda() + " não é do tipo numero");
+			}
+		}
+	}
+	
+	@Override
+	public void outARelacionalMenorIgualExp(ARelacionalMenorIgualExp node) {
+		System.out.println("Key: " + node.getDireita() + " " + node.getEsquerda());
+		HashMap<String,Simbolo> tabelaDeSimbolos = pilhaTabelaSimbolos.peek();
+		if (!verificaTipagem(tabelaDeSimbolos, node.getDireita().toString().split(" ")[0], "numero")) {
+			System.out.println(node.getDireita() + " não é do tipo numero");
+		}else {
+			if (!verificaTipagem(tabelaDeSimbolos, node.getEsquerda().toString().split(" ")[0], "numero")) {
+				System.out.println(node.getEsquerda() + " não é do tipo numero");
+			}
+		}
+	}
+	
+	@Override
+	public void outARelacionalMenorExp(ARelacionalMenorExp node) {
+		System.out.println("Key: " + node.getDireita() + " " + node.getEsquerda());
+		HashMap<String,Simbolo> tabelaDeSimbolos = pilhaTabelaSimbolos.peek();
+		if (!verificaTipagem(tabelaDeSimbolos, node.getDireita().toString().split(" ")[0], "numero")) {
+			System.out.println(node.getDireita() + " não é do tipo numero");
+		}else {
+			if (!verificaTipagem(tabelaDeSimbolos, node.getEsquerda().toString().split(" ")[0], "numero")) {
+				System.out.println(node.getEsquerda() + " não é do tipo numero");
+			}
+		}
+	}
+	
+	@Override
+	public void outARelacionalMaiorIgualExp(ARelacionalMaiorIgualExp node) {
+		System.out.println("Key: " + node.getDireita() + " " + node.getEsquerda());
+		HashMap<String,Simbolo> tabelaDeSimbolos = pilhaTabelaSimbolos.peek();
+		if (!verificaTipagem(tabelaDeSimbolos, node.getDireita().toString().split(" ")[0], "numero")) {
+			System.out.println(node.getDireita() + " não é do tipo numero");
+		}else {
+			if (!verificaTipagem(tabelaDeSimbolos, node.getEsquerda().toString().split(" ")[0], "numero")) {
+				System.out.println(node.getEsquerda() + " não é do tipo numero");
+			}
+		}
+	}
+	
+	@Override
+	public void outARelacionalMaiorExp(ARelacionalMaiorExp node) {
+		System.out.println("Key: " + node.getDireita() + " " + node.getEsquerda());
+		HashMap<String,Simbolo> tabelaDeSimbolos = pilhaTabelaSimbolos.peek();
+		if (!verificaTipagem(tabelaDeSimbolos, node.getDireita().toString().split(" ")[0], "numero")) {
+			System.out.println(node.getDireita() + " não é do tipo numero");
+		}else {
+			if (!verificaTipagem(tabelaDeSimbolos, node.getEsquerda().toString().split(" ")[0], "numero")) {
+				System.out.println(node.getEsquerda() + " não é do tipo numero");
+			}
+		}
+	}
+	
+	@Override
+	public void inARelacionalIgualExp(ARelacionalIgualExp node) {
+		HashMap<String,Simbolo> tabelaDeSimbolos = pilhaTabelaSimbolos.peek();
+		String exp = node.getDireita().toString().split(" ")[0];
+		if (isNumero(exp)) {
+			if (!verificaTipagem(tabelaDeSimbolos, node.getDireita().toString().split(" ")[0], "numero")) {
+				System.out.println(node.getDireita() + " não é do tipo numero");
+			}else {
+				if (!verificaTipagem(tabelaDeSimbolos, node.getEsquerda().toString().split(" ")[0], "numero")) {
+					System.out.println(node.getEsquerda() + " não é do tipo numero");
+				}
+			}
+		}else {
+			if (!verificaTipagem(tabelaDeSimbolos, node.getDireita().toString().split(" ")[0], "caractere")) {
+				System.out.println(node.getDireita() + " não é do tipo numero");
+			}else {
+				if (!verificaTipagem(tabelaDeSimbolos, node.getEsquerda().toString().split(" ")[0], "caractere")) {
+					System.out.println(node.getEsquerda() + " não é do tipo numero");
+				}
+			}
+		}
+	}
+	
+	@Override
+	// Imcompleta
+	public void inALogicaNaoExp(ALogicaNaoExp node) {
+		HashMap<String,Simbolo> tabelaDeSimbolos = pilhaTabelaSimbolos.peek();
+		String[] exps = node.getExp().toString().split(" ");
+		if (exps.length == 1) {
+			if ( !exps.equals("verdadeiro")) {
+				System.out.println("A expressão não é booleana");
+			}else {
+				if( !exps.equals("falso")) {
+					System.out.println("A expressão não é booleana");
+				}
+			}
+		}else {
+			if (exps.length > 1) {
+				String classeDaExp = node.getClass().getSimpleName().toString();
+				if (classeDaExp.contains("ALogica") || classeDaExp.contains("ARelacional")) {
+					if (exps.length <= 2) {
+						for (String exp : exps) {
+							if (!exp.equals("verdadeiro") || !exp.equals("falso")) {
+								System.out.print("A expressao não é booleana");
+							}
+						}
+					}else {
+						for (String exp : exps) {
+							if (!exp.equals("verdadeiro") || !exp.equals("falso")) {
+								System.out.print("A expressao não é booleana");
+							}
+						}
+					}
+				}
+			}
+		}
+	}
 }

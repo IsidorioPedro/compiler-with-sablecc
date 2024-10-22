@@ -11,7 +11,7 @@ inicio
     enquanto (i < n)
     inicio
       chave := lista[i].
-      j := i - 1.
+      j := i - 1 + 2 - 1.
 
       enquanto (j >= 0 e lista[j] > chave)
       inicio
@@ -58,7 +58,7 @@ fim
 
 -> vazio main()
 inicio
-  numero lista[5].
+  vetor numero [2] lista.
   numero tamanho, resposta.
 
   lista[0] := 5.

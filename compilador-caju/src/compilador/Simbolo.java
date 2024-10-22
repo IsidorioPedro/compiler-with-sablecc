@@ -20,6 +20,10 @@ public class Simbolo {
 	            this.parametro.putAll(lista);
 	        }
 	    }
+	    
+	    public Map<String,String> get_Map(){
+	    	return this.parametro;
+	    }
 
 	    public void valor_atribuido() {
 	        atribuido = true;
