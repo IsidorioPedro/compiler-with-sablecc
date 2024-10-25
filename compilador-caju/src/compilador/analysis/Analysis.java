@@ -39,6 +39,8 @@ public interface Analysis extends Switch
     void caseAListaAtribListaAtrib(AListaAtribListaAtrib node);
     void caseAAtribAtrib(AAtribAtrib node);
     void caseAChamadaChamada(AChamadaChamada node);
+    void caseAExibirChamada(AExibirChamada node);
+    void caseALerChamada(ALerChamada node);
     void caseAListaExpListaExp(AListaExpListaExp node);
     void caseAEmptyListaExp(AEmptyListaExp node);
     void caseAPositivoNumeroComSinal(APositivoNumeroComSinal node);
@@ -101,6 +103,8 @@ public interface Analysis extends Switch
     void caseTE(TE node);
     void caseTOu(TOu node);
     void caseTNao(TNao node);
+    void caseTLer(TLer node);
+    void caseTExibir(TExibir node);
     void caseTCaractere(TCaractere node);
     void caseTTexto(TTexto node);
     void caseTNumero(TNumero node);

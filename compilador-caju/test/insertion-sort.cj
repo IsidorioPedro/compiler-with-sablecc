@@ -31,9 +31,9 @@ inicio
     para (i := 0; i <= n - 1; i := i + 1)
     inicio
         exibir(lista[i]).
-        exibir(' ').
+        exibir().
     fim
-    exibir('\n').
+    exibir("\n").
 fim
 
 numero solicitarOrdenacao(vetor numero [2] lista | numero n)

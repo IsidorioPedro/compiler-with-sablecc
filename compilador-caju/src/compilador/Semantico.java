@@ -40,6 +40,22 @@ public class Semantico extends DepthFirstAdapter {
 	@Override
 	public void outStart(Start node)
 	    {
+			int cont = 0;
+			HashMap<String, Simbolo> tabelaDeSimbolosTopo = pilhaTabelaSimbolos.peek();
+			for (String chave : tabelaDeSimbolosTopo.keySet()) {
+			    Simbolo valor = tabelaDeSimbolosTopo.get(chave);
+			    if (valor.get_inicial()) {
+			    	cont ++;
+			    }
+			}
+			if (cont >= 2) {
+				System.out.println("Não pode haver mais do que um função inicializadora!");
+			}else {
+				if (cont == 0) {
+					System.out.println("Nao foi encontrado nenhuma função inicial no codigo!");
+				}
+			}
+
 		    System.out.println("-------------------------------------------------");
 	        System.out.println("Fim da análise semântica");
 	        System.out.println("-------------------------------------------------");  
@@ -48,8 +64,8 @@ public class Semantico extends DepthFirstAdapter {
 	@Override
 	public void inABlocoBloco(ABlocoBloco node) 
 	    {
-		    HashMap<String, Simbolo> tabelaDeSimbolosTopo = pilhaTabelaSimbolos.peek();   
-		  
+		    HashMap<String, Simbolo> tabelaDeSimbolosTopo = pilhaTabelaSimbolos.peek();
+		    
 		    pilhaTabelaSimbolos.push(new HashMap<>(tabelaDeSimbolosTopo));
 		    /*
 		    System.out.println("Tabela de Símbolos IN:");
@@ -77,17 +93,50 @@ public class Semantico extends DepthFirstAdapter {
 	    }
 	
 	@Override
+	public void outAExibirChamada(AExibirChamada node) {
+		String[] exps = node.getListaExp().toString().split(" ");
+		HashMap<String, Simbolo> tabelaDeSimbolos = pilhaTabelaSimbolos.peek();
+		for (String exp: exps) {
+			Optional<Simbolo> veriSimbolo = Optional.ofNullable(tabelaDeSimbolos.get(exp));
+			if(veriSimbolo.isPresent()) {
+				Simbolo sim = veriSimbolo.get();
+				if (!sim.get_valor_atribuido()) {
+					System.out.println("A varaivel " + exp + " não tem nenhum valor atribuido!");
+				}
+			}
+		}
+		
+		
+	}
+	
+	@Override
+	public void outALerChamada(ALerChamada node) {
+		String[] exps = node.getListaExp().toString().split(" ");
+		HashMap<String, Simbolo> tabelaDeSimbolos = pilhaTabelaSimbolos.peek();
+		for (String exp: exps) {
+			Optional<Simbolo> veriSimbolo = Optional.ofNullable(tabelaDeSimbolos.get(exp));
+			if(veriSimbolo.isPresent()) {
+				Simbolo sim = veriSimbolo.get();
+				if (!sim.get_valor_atribuido()) {
+					System.out.println("A varaivel " + exp + " não tem nenhum valor atribuido!");
+				}
+			}
+		}
+	}
+	
+	@Override
 	public void outAParametroParametro(AParametroParametro node) {
 		HashMap<String, Simbolo> tabelaDeSimbolos = pilhaTabelaSimbolos.peek();
 		String key = node.getId().toString().split(" ")[0];
-		Simbolo simbolo = new Simbolo(node.getTipo().toString(), false);
-		System.out.println(key + " de tipo " + node.getTipo().toString() + " adicionado na tabela de símbolos.");
+		Simbolo simbolo = new Simbolo(node.getTipo().toString(), true, false);
+		// System.out.println(key + " de tipo " + node.getTipo().toString() + " adicionado na tabela de símbolos.");
 		tabelaDeSimbolos.put(key, simbolo);
 	}
 	
 	@Override
 	public void outAComumDecFuncao(AComumDecFuncao node) 
 		{
+			// System.out.println("Var: " + node.getId() + "/ " + node.getParametros());
 			HashMap<String, Simbolo> tabelaDeSimbolos = pilhaTabelaSimbolos.peek();
 			List<PParametro> listaParametro = new ArrayList<>(node.getParametros());
 			Map<String, String> Parametro = new HashMap<>();
@@ -98,7 +147,7 @@ public class Semantico extends DepthFirstAdapter {
 					String parametro = String.join(" ", p.toString().split(" ")[0], p.toString().split(" ")[1], p.toString().split(" ")[2]);
 					if (tabelaDeSimbolos.containsKey(var)) {
 				        tabelaDeSimbolos.remove(var);
-				        System.out.println("Removendo parametro da tabela de simbolos: " + var);
+				        // System.out.println("Removendo parametro da tabela de simbolos: " + var);
 				    } else {
 				        System.out.println("ERRO: Símbolo com chave " + var + " não encontrado na tabela de símbolos.");
 				    }
@@ -108,20 +157,57 @@ public class Semantico extends DepthFirstAdapter {
 					String parametro = p.toString().split(" ")[0];
 					if (tabelaDeSimbolos.containsKey(var)) {
 				        tabelaDeSimbolos.remove(var);
-				        System.out.println("Removendo parametro da tabela de simbolos: " + var);
+				        // System.out.println("Removendo parametro da tabela de simbolos: " + var);
 				    } else {
 				        System.out.println("ERRO: Símbolo com chave " + var + " não encontrado na tabela de símbolos.");
 				    }
 					Parametro.put(var, parametro);
 				}
 			}
-			System.out.println("Key " + node.getId().toString());
+			// System.out.println("Key " + node.getId().toString());
 			// System.out.println("Tipo " + node.getTipoRetorno().toString());
 			String key = node.getId().toString().split(" ")[0];
-			Simbolo simbolo = new Simbolo(node.getTipoRetorno().toString(), false);
+			Simbolo simbolo = new Simbolo(node.getTipoRetorno().toString(), false, false);
 			simbolo.set_Map(Parametro);
 			tabelaDeSimbolos.put(key, simbolo);
 		}
+	
+	@Override
+	public void outAInicialDecFuncao(AInicialDecFuncao node) {
+		HashMap<String, Simbolo> tabelaDeSimbolos = pilhaTabelaSimbolos.getLast();
+		List<PParametro> listaParametro = new ArrayList<>(node.getParametros());
+		Map<String, String> Parametro = new HashMap<>();
+		for (PParametro p : listaParametro) {
+			String tipo = p.toString().split(" ")[0];
+			if (tipo.equals("vetor")) {
+				String var = p.toString().split(" ")[3];
+				String parametro = String.join(" ", p.toString().split(" ")[0], p.toString().split(" ")[1], p.toString().split(" ")[2]);
+				if (tabelaDeSimbolos.containsKey(var)) {
+			        tabelaDeSimbolos.remove(var);
+			        // System.out.println("Removendo parametro da tabela de simbolos: " + var);
+			    } else {
+			        System.out.println("ERRO: Símbolo com chave " + var + " não encontrado na tabela de símbolos.");
+			    }
+				Parametro.put(var, parametro);
+			}else {
+				String var = p.toString().split(" ")[1];
+				String parametro = p.toString().split(" ")[0];
+				if (tabelaDeSimbolos.containsKey(var)) {
+			        tabelaDeSimbolos.remove(var);
+			        // System.out.println("Removendo parametro da tabela de simbolos: " + var);
+			    } else {
+			        System.out.println("ERRO: Símbolo com chave " + var + " não encontrado na tabela de símbolos.");
+			    }
+				Parametro.put(var, parametro);
+			}
+		}
+		//System.out.println("Key " + node.getId().toString());
+		// System.out.println("Tipo " + node.getTipoRetorno().toString());
+		String key = node.getId().toString().split(" ")[0];
+		Simbolo simbolo = new Simbolo(node.getTipoRetorno().toString(), false, true);
+		simbolo.set_Map(Parametro);
+		tabelaDeSimbolos.put(key, simbolo);
+	}
 	  
 	@Override
 	public void outADecVariavelDecVariavel(ADecVariavelDecVariavel node) 
@@ -131,9 +217,9 @@ public class Semantico extends DepthFirstAdapter {
 
 	        for (PVar v : listaVariaveis) {
 	            String key = v.toString().split(" ")[0];
-	            Simbolo simbolo = new Simbolo(node.getTipo().toString(), false);
+	            Simbolo simbolo = new Simbolo(node.getTipo().toString(), false, false);
 	            tabelaDeSimbolos.put(key, simbolo);
-	            System.out.println(key + " de tipo " + node.getTipo().toString() + " adicionado na tabela de símbolos.");
+	            // System.out.println(key + " de tipo " + node.getTipo().toString() + " adicionado na tabela de símbolos.");
 	        }
 	    }
 	
@@ -223,6 +309,8 @@ public class Semantico extends DepthFirstAdapter {
             	String nomeDaExpressao = node.getExp().getClass().getSimpleName().toString();
             	if ( nomeDaExpressao.contains("ALogica") || nomeDaExpressao.contains("ARelacional")) {
             		System.out.println("A atribuição para a variavel: " + key + " . Não é expressão aritmetica");
+            	}else {
+            		simbolo.valor_atribuido();
             	}
             }
             // Caso a variavel for um caractere
@@ -234,6 +322,8 @@ public class Semantico extends DepthFirstAdapter {
             	}else {
             		if ( !nomeDaExpressao.contains("AAritmeticaSomaExp") && !nomeDaExpressao.contains("ACaractere")) {
             			System.out.println("A atribuição para a variavel: " + key + " .Não é operação de concatenação ou expressão de caractere");
+            		}else {
+            			simbolo.valor_atribuido();
             		}
             	}
             }
@@ -241,11 +331,12 @@ public class Semantico extends DepthFirstAdapter {
             if (simbolo.get_tipo().equals("booleano ") || simbolo.get_tipo().toString().contains("vetor booleano")) {
             	String[] exps = node.getExp().toString().trim().split(" ");
             	String nomeDaExpressao = node.getExp().getClass().getSimpleName().toString();
-            	if ( !nomeDaExpressao.contains("AAritmetica") ) {
+            	if ( nomeDaExpressao.contains("AAritmetica") ) {
             		System.out.println("A atribuição para a variavel: " + key + " . Nem é expressão logica ou relacional");
+            	}else {
+            		simbolo.valor_atribuido();
             	}
             }
-            simbolo.valor_atribuido();
         }else {
             System.out.println("ERRO: " + key + " não foi declarado.");
         }
@@ -303,7 +394,7 @@ public class Semantico extends DepthFirstAdapter {
 	
 	@Override
 	public void outAAritmeticaSomaExp(AAritmeticaSomaExp node) {
-		System.out.println("Key: " + node.getDireita() + " " + node.getEsquerda());
+		// System.out.println("Key: " + node.getDireita() + " " + node.getEsquerda());
 		HashMap<String,Simbolo> tabelaDeSimbolos = pilhaTabelaSimbolos.peek();
 		String[] expsDir = node.getDireita().toString().split(" ");
 		String[] expsEsq = node.getEsquerda().toString().split(" ");
@@ -351,7 +442,7 @@ public class Semantico extends DepthFirstAdapter {
 	
 	@Override
 	public void outAAritmeticaSubtracaoExp(AAritmeticaSubtracaoExp node) {
-		System.out.println("Key: " + node.getDireita() + " " + node.getEsquerda());
+		// System.out.println("Key: " + node.getDireita() + " " + node.getEsquerda());
 		HashMap<String,Simbolo> tabelaDeSimbolos = pilhaTabelaSimbolos.peek();
 		String[] expsDir = node.getDireita().toString().split(" ");
 		String[] expsEsq = node.getEsquerda().toString().split(" ");
@@ -391,7 +482,7 @@ public class Semantico extends DepthFirstAdapter {
 	
 	@Override
 	public void outAAritmeticaMultiplicacaoExp(AAritmeticaMultiplicacaoExp node) {
-		System.out.println("Key: " + node.getDireita() + " " + node.getEsquerda());
+		// System.out.println("Key: " + node.getDireita() + " " + node.getEsquerda());
 		HashMap<String,Simbolo> tabelaDeSimbolos = pilhaTabelaSimbolos.peek();
 		String[] expsDir = node.getDireita().toString().split(" ");
 		String[] expsEsq = node.getEsquerda().toString().split(" ");
@@ -431,7 +522,7 @@ public class Semantico extends DepthFirstAdapter {
 	
 	@Override
 	public void outAAritmeticaDivisaoExp(AAritmeticaDivisaoExp node) {
-		System.out.println("Key: " + node.getDireita() + " " + node.getEsquerda());
+		// System.out.println("Key: " + node.getDireita() + " " + node.getEsquerda());
 		HashMap<String,Simbolo> tabelaDeSimbolos = pilhaTabelaSimbolos.peek();
 		String[] expsDir = node.getDireita().toString().split(" ");
 		String[] expsEsq = node.getEsquerda().toString().split(" ");
@@ -471,7 +562,7 @@ public class Semantico extends DepthFirstAdapter {
 	
 	@Override
 	public void outARelacionalMenorIgualExp(ARelacionalMenorIgualExp node) {
-		System.out.println("Key: " + node.getDireita() + " " + node.getEsquerda());
+		// System.out.println("Key: " + node.getDireita() + " " + node.getEsquerda());
 		HashMap<String,Simbolo> tabelaDeSimbolos = pilhaTabelaSimbolos.peek();
 		String[] expsDir = node.getDireita().toString().split(" ");
 		String[] expsEsq = node.getEsquerda().toString().split(" ");
@@ -511,7 +602,7 @@ public class Semantico extends DepthFirstAdapter {
 	
 	@Override
 	public void outARelacionalMenorExp(ARelacionalMenorExp node) {
-		System.out.println("Key: " + node.getDireita() + " " + node.getEsquerda());
+		// System.out.println("Key: " + node.getDireita() + " " + node.getEsquerda());
 		HashMap<String,Simbolo> tabelaDeSimbolos = pilhaTabelaSimbolos.peek();
 		String[] expsDir = node.getDireita().toString().split(" ");
 		String[] expsEsq = node.getEsquerda().toString().split(" ");
@@ -551,7 +642,7 @@ public class Semantico extends DepthFirstAdapter {
 	
 	@Override
 	public void outARelacionalMaiorIgualExp(ARelacionalMaiorIgualExp node) {
-		System.out.println("Key: " + node.getDireita() + " " + node.getEsquerda());
+		// System.out.println("Key: " + node.getDireita() + " " + node.getEsquerda());
 		HashMap<String,Simbolo> tabelaDeSimbolos = pilhaTabelaSimbolos.peek();
 		String[] expsDir = node.getDireita().toString().split(" ");
 		String[] expsEsq = node.getEsquerda().toString().split(" ");
@@ -591,7 +682,7 @@ public class Semantico extends DepthFirstAdapter {
 	
 	@Override
 	public void outARelacionalMaiorExp(ARelacionalMaiorExp node) {
-		System.out.println("Key: " + node.getDireita() + " " + node.getEsquerda());
+		// System.out.println("Key: " + node.getDireita() + " " + node.getEsquerda());
 		HashMap<String,Simbolo> tabelaDeSimbolos = pilhaTabelaSimbolos.peek();
 		String[] expsDir = node.getDireita().toString().split(" ");
 		String[] expsEsq = node.getEsquerda().toString().split(" ");
@@ -768,6 +859,83 @@ public class Semantico extends DepthFirstAdapter {
 					System.out.println("Não pode usar a operação 'e' em um booleano com uma expressão aritmetica!");
 				}
 			}
+		}
+	}
+	
+	@Override
+	public void outAEnquantoComando(AEnquantoComando node) {
+		HashMap<String,Simbolo> tabelaDeSimbolos = pilhaTabelaSimbolos.peek();
+		String[] exps = node.getExp().toString().split(" ");
+		String classeDeExp = node.getExp().getClass().getSimpleName().toString();
+		if ( classeDeExp.contains("ARelacional") || classeDeExp.contains("ALogica") ) {
+			if (exps.length == 1) {
+				if (!verificaTipagem(tabelaDeSimbolos, exps[0], "booleano")) {
+					System.out.println("A variavel que esta no escopo, não é booleano!");
+				}
+			}
+		} else {
+			System.out.println("Essa operação não aceita expressão aritmetica!!");
+		}
+	}
+	
+	@Override
+	public void outAParaCadaComando(AParaCadaComando node) {
+		HashMap<String,Simbolo> tabelaDeSimbolos = pilhaTabelaSimbolos.peek();
+		String id = node.getDireita().toString().split(" ")[0];
+		Optional<Simbolo> veriSimbolo = Optional.ofNullable(tabelaDeSimbolos.get(id));
+		if(veriSimbolo.isPresent()) {
+			Simbolo sim = veriSimbolo.get();
+			if (!sim.get_valor_atribuido()) {
+				System.out.println("A variavel " + id + " não tem nenhum valor atribuido!");
+			}
+		}
+	}
+	
+	@Override
+	public void outAParaComando(AParaComando node) {
+		HashMap<String,Simbolo> tabelaDeSimbolos = pilhaTabelaSimbolos.peek();
+		String[] exps = node.getExp().toString().split(" ");
+		String classeDeExp = node.getExp().getClass().getSimpleName().toString();
+		if ( classeDeExp.contains("ARelacional") || classeDeExp.contains("ALogica") ) {
+			if (exps.length == 1) {
+				if (!verificaTipagem(tabelaDeSimbolos, exps[0], "booleano")) {
+					System.out.println("A variavel que esta no escopo, não é booleano!");
+				}
+			}
+		} else {
+			System.out.println("Essa operação não aceita expressão aritmetica!!");
+		}
+	}
+	
+	@Override
+	public void outASeComando(ASeComando node) {
+		HashMap<String,Simbolo> tabelaDeSimbolos = pilhaTabelaSimbolos.peek();
+		String[] exps = node.getExp().toString().split(" ");
+		String classeDeExp = node.getExp().getClass().getSimpleName().toString();
+		if ( classeDeExp.contains("ARelacional") || classeDeExp.contains("ALogica") ) {
+			if (exps.length == 1) {
+				if (!verificaTipagem(tabelaDeSimbolos, exps[0], "booleano")) {
+					System.out.println("A variavel que esta no escopo, não é booleano!");
+				}
+			}
+		} else {
+			System.out.println("Essa operação não aceita expressão aritmetica!!");
+		}
+	}
+	
+	@Override
+	public void caseASeSenaoComando(ASeSenaoComando node) {
+		HashMap<String,Simbolo> tabelaDeSimbolos = pilhaTabelaSimbolos.peek();
+		String[] exps = node.getExp().toString().split(" ");
+		String classeDeExp = node.getExp().getClass().getSimpleName().toString();
+		if ( classeDeExp.contains("ARelacional") || classeDeExp.contains("ALogica") ) {
+			if (exps.length == 1) {
+				if (!verificaTipagem(tabelaDeSimbolos, exps[0], "booleano")) {
+					System.out.println("A variavel que esta no escopo, não é booleano!");
+				}
+			}
+		} else {
+			System.out.println("Essa operação não aceita expressão aritmetica!!");
 		}
 	}
 }

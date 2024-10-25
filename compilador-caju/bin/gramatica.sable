@@ -79,8 +79,8 @@ Tokens
     nao = 'nao';
     
     /* procedimentos primitivos*/
-    //ler = 'ler';
-    //exibir = 'exibir';
+    ler = 'ler';
+    exibir = 'exibir';
 
     /* identificadores */
     caractere = ''' (caractere_singular | caractere_multiplo) ''';
@@ -213,7 +213,9 @@ Productions
         {exp_logica} expressao_logica {-> expressao_logica.exp};
 
     chamada {-> chamada} = 
-        id abre_parentese lista_exp fecha_parentese {-> New chamada.chamada(id, lista_exp)};
+        {chamada} id abre_parentese lista_exp fecha_parentese {-> New chamada.chamada(id, lista_exp)} |
+        {chamada_exibir} exibir abre_parentese lista_exp fecha_parentese {-> New chamada.exibir(exibir ,lista_exp)} |
+        {chamada_ler} ler abre_parentese lista_exp fecha_parentese {-> New chamada.ler(ler, lista_exp)};
 
     lista_exp {-> lista_exp} = 
         {args} exp multiplos_exp* {-> New lista_exp.lista_exp([exp, multiplos_exp.exp])} |
@@ -269,7 +271,10 @@ Abstract Syntax Tree
 
     atrib = {atrib} var exp;
 
-    chamada = {chamada} id lista_exp;
+    chamada = 
+    {chamada} id lista_exp |
+    {exibir} exibir lista_exp |
+    {ler} ler lista_exp;
 
     lista_exp = 
         {lista_exp} exp+ | 

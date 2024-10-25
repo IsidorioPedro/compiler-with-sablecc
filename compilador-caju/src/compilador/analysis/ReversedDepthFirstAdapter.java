@@ -743,6 +743,56 @@ public class ReversedDepthFirstAdapter extends AnalysisAdapter
         outAChamadaChamada(node);
     }
 
+    public void inAExibirChamada(AExibirChamada node)
+    {
+        defaultIn(node);
+    }
+
+    public void outAExibirChamada(AExibirChamada node)
+    {
+        defaultOut(node);
+    }
+
+    @Override
+    public void caseAExibirChamada(AExibirChamada node)
+    {
+        inAExibirChamada(node);
+        if(node.getListaExp() != null)
+        {
+            node.getListaExp().apply(this);
+        }
+        if(node.getExibir() != null)
+        {
+            node.getExibir().apply(this);
+        }
+        outAExibirChamada(node);
+    }
+
+    public void inALerChamada(ALerChamada node)
+    {
+        defaultIn(node);
+    }
+
+    public void outALerChamada(ALerChamada node)
+    {
+        defaultOut(node);
+    }
+
+    @Override
+    public void caseALerChamada(ALerChamada node)
+    {
+        inALerChamada(node);
+        if(node.getListaExp() != null)
+        {
+            node.getListaExp().apply(this);
+        }
+        if(node.getLer() != null)
+        {
+            node.getLer().apply(this);
+        }
+        outALerChamada(node);
+    }
+
     public void inAListaExpListaExp(AListaExpListaExp node)
     {
         defaultIn(node);

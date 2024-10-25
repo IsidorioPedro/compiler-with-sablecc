@@ -237,6 +237,18 @@ public class AnalysisAdapter implements Analysis
     }
 
     @Override
+    public void caseAExibirChamada(AExibirChamada node)
+    {
+        defaultCase(node);
+    }
+
+    @Override
+    public void caseALerChamada(ALerChamada node)
+    {
+        defaultCase(node);
+    }
+
+    @Override
     public void caseAListaExpListaExp(AListaExpListaExp node)
     {
         defaultCase(node);
@@ -598,6 +610,18 @@ public class AnalysisAdapter implements Analysis
 
     @Override
     public void caseTNao(TNao node)
+    {
+        defaultCase(node);
+    }
+
+    @Override
+    public void caseTLer(TLer node)
+    {
+        defaultCase(node);
+    }
+
+    @Override
+    public void caseTExibir(TExibir node)
     {
         defaultCase(node);
     }
