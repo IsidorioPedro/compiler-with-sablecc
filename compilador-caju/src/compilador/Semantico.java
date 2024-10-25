@@ -187,30 +187,25 @@ public class Semantico extends DepthFirstAdapter {
 			}
 		}
 		if (tipagem.equals("booleano")) {
-			if ( isNumero(exp) ) {
+			if ( exp.equals("verdadeira") || exp.equals("falso") ) {
 				// System.out.println("Exp é um numero: " + exp);
 				return true;
 			}else {
-				if ( !isNumero(exp)) {
-					// System.out.println("Exp é um caractere: " + exp);
-					return true;
+				Optional<Simbolo> veriSimbolo = Optional.ofNullable(tabelaDeSimbolos.get(exp));
+				if(veriSimbolo.isPresent()) {
+					Simbolo sim = veriSimbolo.get();
+					if (sim.get_tipo().equals("booleano ") ) {
+						// System.out.println("A variavel: " + exp + " é caractere ou numero");
+						return true;
+					}else {
+						if (sim.get_tipo().toString().split(" ")[0].equals("vetor")) {
+							// System.out.println("A variavel: " + exp + " é vetor caractere");
+							return true;
+						}
+					}
 				}else {
-					Optional<Simbolo> veriSimbolo = Optional.ofNullable(tabelaDeSimbolos.get(exp));
-    				if(veriSimbolo.isPresent()) {
-    					Simbolo sim = veriSimbolo.get();
-    					if (sim.get_tipo().equals("caractere ") || sim.get_tipo().equals("numero ")) {
-    						// System.out.println("A variavel: " + exp + " é caractere ou numero");
-    						return true;
-    					}else {
-    						if (sim.get_tipo().toString().split(" ")[0].equals("vetor")) {
-    							// System.out.println("A variavel: " + exp + " é vetor caractere");
-    							return true;
-    						}
-    					}
-    				}else {
-    					//System.out.println("A atribuição para a variavel: " + key + " . Não é caractere ou numero");
-    					return false;
-    				}
+					//System.out.println("A atribuição para a variavel: " + key + " . Não é caractere ou numero");
+					return false;
 				}
 			}
 		}
@@ -310,11 +305,46 @@ public class Semantico extends DepthFirstAdapter {
 	public void outAAritmeticaSomaExp(AAritmeticaSomaExp node) {
 		System.out.println("Key: " + node.getDireita() + " " + node.getEsquerda());
 		HashMap<String,Simbolo> tabelaDeSimbolos = pilhaTabelaSimbolos.peek();
-		if (!verificaTipagem(tabelaDeSimbolos, node.getDireita().toString().split(" ")[0], "numero")) {
-			System.out.println(node.getDireita() + " não é do tipo numero");
+		String[] expsDir = node.getDireita().toString().split(" ");
+		String[] expsEsq = node.getEsquerda().toString().split(" ");
+		String classeDaExpEsq = node.getDireita().getClass().getSimpleName().toString();
+		String classeDaExpDir = node.getEsquerda().getClass().getSimpleName().toString();
+		if (expsDir.length == 1 || expsEsq.length == 1) {
+			if ( verificaTipagem(tabelaDeSimbolos, node.getDireita().toString().split(" ")[0], "numero") ) {
+				if ( !verificaTipagem(tabelaDeSimbolos, node.getEsquerda().toString().split(" ")[0], "numero") ) {
+					System.out.println(node.getEsquerda() + " não é do tipo numero");
+				}
+			}else {
+				if ( verificaTipagem(tabelaDeSimbolos, node.getDireita().toString().split(" ")[0], "caractere")) {
+					if ( !verificaTipagem(tabelaDeSimbolos, node.getEsquerda().toString().split(" ")[0], "caractere")) {
+						System.out.println(node.getEsquerda() + " não é do tipo caractere");
+					}
+				}else {
+					System.out.println("A variavel " + node.getDireita() + " não é do tipo caractere");
+				}
+			}
 		}else {
-			if (!verificaTipagem(tabelaDeSimbolos, node.getEsquerda().toString().split(" ")[0], "numero")) {
-				System.out.println(node.getEsquerda() + " não é do tipo numero");
+			// Caso: (2 - 1) == (1 > 2) OU (2 > 1) == (1 - 2)
+			if ( classeDaExpEsq.contains("AAritmetica") || classeDaExpDir.contains("AAritmetica") ) {
+				if ( (classeDaExpDir.contains("ALogica") || classeDaExpDir.contains("ARelacional")) || (classeDaExpEsq.contains("ALogica") || classeDaExpEsq.contains("ARelacional")) ) {
+					System.out.println("Uma expressão aritmética não pode ser soma diretamente com uma expressão lógica ou relacional, e vice-versa!");
+				}
+			}
+			// Caso: (2 > 1) == 1 OU 1 == (2 > 1)
+			if (classeDaExpEsq.contains("ANumeroExp") || classeDaExpDir.contains("ANumeroExp")) {
+				if ( (classeDaExpDir.contains("ALogica") || classeDaExpDir.contains("ARelacional")) || (classeDaExpEsq.contains("ALogica") || classeDaExpEsq.contains("ARelacional")) ) {
+					System.out.println("Não é possível soma um numero com um resultado booleano usando a operação adição!");
+				}
+			}
+			// Caso: (2 > 1) == "cara" OU "cara" == (1 > 2)
+			if ( classeDaExpEsq.contains("ACaractereExp") || classeDaExpDir.contains("ACaractereExp") ) {
+				if ( !classeDaExpEsq.contains("AAritmeticaSomaExp") || !classeDaExpDir.contains("AAritmeticaSomaExp") ) {
+					System.out.println("Não é possível soma um caractere com um resultado aritmetico ou logico usando a operação adição!");
+				}
+			}
+			// Caso: verdadeiro == (1 - 2) OU (2 - 1) == verdadeira
+			if ( classeDaExpEsq.contains("ABooleanoExp") || classeDaExpDir.contains("ABooleanoExp") ) {
+				System.out.println("Não é possível soma um booleano com um resultado aritmético usando a operação adição!");
 			}
 		}
 	}
@@ -323,11 +353,38 @@ public class Semantico extends DepthFirstAdapter {
 	public void outAAritmeticaSubtracaoExp(AAritmeticaSubtracaoExp node) {
 		System.out.println("Key: " + node.getDireita() + " " + node.getEsquerda());
 		HashMap<String,Simbolo> tabelaDeSimbolos = pilhaTabelaSimbolos.peek();
-		if (!verificaTipagem(tabelaDeSimbolos, node.getDireita().toString().split(" ")[0], "numero")) {
-			System.out.println(node.getDireita() + " não é do tipo numero");
+		String[] expsDir = node.getDireita().toString().split(" ");
+		String[] expsEsq = node.getEsquerda().toString().split(" ");
+		String classeDaExpEsq = node.getDireita().getClass().getSimpleName().toString();
+		String classeDaExpDir = node.getEsquerda().getClass().getSimpleName().toString();
+		if (expsDir.length == 1 || expsEsq.length == 1) {
+			if ( verificaTipagem(tabelaDeSimbolos, node.getDireita().toString().split(" ")[0], "numero") ) {
+				if ( !verificaTipagem(tabelaDeSimbolos, node.getEsquerda().toString().split(" ")[0], "numero") ) {
+					System.out.println(node.getEsquerda() + " não é do tipo numero");
+				}
+			}else {
+				System.out.println("A variavel " + node.getDireita() + " não é do tipo numero");
+			}
 		}else {
-			if (!verificaTipagem(tabelaDeSimbolos, node.getEsquerda().toString().split(" ")[0], "numero")) {
-				System.out.println(node.getEsquerda() + " não é do tipo numero");
+			// Caso: (2 - 1) == (1 > 2) OU (2 > 1) == (1 - 2)
+			if ( classeDaExpEsq.contains("AAritmetica") || classeDaExpDir.contains("AAritmetica") ) {
+				if ( (classeDaExpDir.contains("ALogica") || classeDaExpDir.contains("ARelacional")) || (classeDaExpEsq.contains("ALogica") || classeDaExpEsq.contains("ARelacional")) ) {
+					System.out.println("Uma expressão aritmética não pode ser subtrai diretamente com uma expressão lógica ou relacional, e vice-versa!");
+				}
+			}
+			// Caso: (2 > 1) == 1 OU 1 == (2 > 1)
+			if (classeDaExpEsq.contains("ANumeroExp") || classeDaExpDir.contains("ANumeroExp")) {
+				if ( (classeDaExpDir.contains("ALogica") || classeDaExpDir.contains("ARelacional")) || (classeDaExpEsq.contains("ALogica") || classeDaExpEsq.contains("ARelacional")) ) {
+					System.out.println("Não é possível subtrair um numero com um resultado booleano usando a operação subtração!");
+				}
+			}
+			// Caso: (2 > 1) == "cara" OU "cara" == (1 > 2)
+			if ( classeDaExpEsq.contains("ACaractereExp") || classeDaExpDir.contains("ACaractereExp") ) {
+				System.out.println("Não é possível subtrair um caractere com um resultado aritmético usando a operação subtração!");
+			}
+			// Caso: verdadeiro == (1 - 2) OU (2 - 1) == verdadeira
+			if ( classeDaExpEsq.contains("ABooleanoExp") || classeDaExpDir.contains("ABooleanoExp") ) {
+				System.out.println("Não é possível subtrair um booleano com um resultado aritmético usando a operação subtração!");
 			}
 		}
 	}
@@ -336,11 +393,38 @@ public class Semantico extends DepthFirstAdapter {
 	public void outAAritmeticaMultiplicacaoExp(AAritmeticaMultiplicacaoExp node) {
 		System.out.println("Key: " + node.getDireita() + " " + node.getEsquerda());
 		HashMap<String,Simbolo> tabelaDeSimbolos = pilhaTabelaSimbolos.peek();
-		if (!verificaTipagem(tabelaDeSimbolos, node.getDireita().toString().split(" ")[0], "numero")) {
-			System.out.println(node.getDireita() + " não é do tipo numero");
+		String[] expsDir = node.getDireita().toString().split(" ");
+		String[] expsEsq = node.getEsquerda().toString().split(" ");
+		String classeDaExpEsq = node.getDireita().getClass().getSimpleName().toString();
+		String classeDaExpDir = node.getEsquerda().getClass().getSimpleName().toString();
+		if (expsDir.length == 1 || expsEsq.length == 1) {
+			if ( verificaTipagem(tabelaDeSimbolos, node.getDireita().toString().split(" ")[0], "numero") ) {
+				if ( !verificaTipagem(tabelaDeSimbolos, node.getEsquerda().toString().split(" ")[0], "numero") ) {
+					System.out.println(node.getEsquerda() + " não é do tipo numero");
+				}
+			}else {
+				System.out.println("A variavel " + node.getDireita() + " não é do tipo numero");
+			}
 		}else {
-			if (!verificaTipagem(tabelaDeSimbolos, node.getEsquerda().toString().split(" ")[0], "numero")) {
-				System.out.println(node.getEsquerda() + " não é do tipo numero");
+			// Caso: (2 - 1) == (1 > 2) OU (2 > 1) == (1 - 2)
+			if ( classeDaExpEsq.contains("AAritmetica") || classeDaExpDir.contains("AAritmetica") ) {
+				if ( (classeDaExpDir.contains("ALogica") || classeDaExpDir.contains("ARelacional")) || (classeDaExpEsq.contains("ALogica") || classeDaExpEsq.contains("ARelacional")) ) {
+					System.out.println("Uma expressão aritmética não pode ser multiplica diretamente com uma expressão lógica ou relacional, e vice-versa!");
+				}
+			}
+			// Caso: (2 > 1) == 1 OU 1 == (2 > 1)
+			if (classeDaExpEsq.contains("ANumeroExp") || classeDaExpDir.contains("ANumeroExp")) {
+				if ( (classeDaExpDir.contains("ALogica") || classeDaExpDir.contains("ARelacional")) || (classeDaExpEsq.contains("ALogica") || classeDaExpEsq.contains("ARelacional")) ) {
+					System.out.println("Não é possível multiplicar um numero com um resultado booleano usando a operação multiplicação!");
+				}
+			}
+			// Caso: (2 > 1) == "cara" OU "cara" == (1 > 2)
+			if ( classeDaExpEsq.contains("ACaractereExp") || classeDaExpDir.contains("ACaractereExp") ) {
+				System.out.println("Não é possível multiplicar um caractere com um resultado aritmético usando a operação multiplicação!");
+			}
+			// Caso: verdadeiro == (1 - 2) OU (2 - 1) == verdadeira
+			if ( classeDaExpEsq.contains("ABooleanoExp") || classeDaExpDir.contains("ABooleanoExp") ) {
+				System.out.println("Não é possível multiplicar um booleano com um resultado aritmético usando a operação multiplicação!");
 			}
 		}
 	}
@@ -349,11 +433,38 @@ public class Semantico extends DepthFirstAdapter {
 	public void outAAritmeticaDivisaoExp(AAritmeticaDivisaoExp node) {
 		System.out.println("Key: " + node.getDireita() + " " + node.getEsquerda());
 		HashMap<String,Simbolo> tabelaDeSimbolos = pilhaTabelaSimbolos.peek();
-		if (!verificaTipagem(tabelaDeSimbolos, node.getDireita().toString().split(" ")[0], "numero")) {
-			System.out.println(node.getDireita() + " não é do tipo numero");
+		String[] expsDir = node.getDireita().toString().split(" ");
+		String[] expsEsq = node.getEsquerda().toString().split(" ");
+		String classeDaExpEsq = node.getDireita().getClass().getSimpleName().toString();
+		String classeDaExpDir = node.getEsquerda().getClass().getSimpleName().toString();
+		if (expsDir.length == 1 || expsEsq.length == 1) {
+			if ( verificaTipagem(tabelaDeSimbolos, node.getDireita().toString().split(" ")[0], "numero") ) {
+				if ( !verificaTipagem(tabelaDeSimbolos, node.getEsquerda().toString().split(" ")[0], "numero") ) {
+					System.out.println(node.getEsquerda() + " não é do tipo numero");
+				}
+			}else {
+				System.out.println("A variavel " + node.getDireita() + " não é do tipo numero");
+			}
 		}else {
-			if (!verificaTipagem(tabelaDeSimbolos, node.getEsquerda().toString().split(" ")[0], "numero")) {
-				System.out.println(node.getEsquerda() + " não é do tipo numero");
+			// Caso: (2 - 1) == (1 > 2) OU (2 > 1) == (1 - 2)
+			if ( classeDaExpEsq.contains("AAritmetica") || classeDaExpDir.contains("AAritmetica") ) {
+				if ( (classeDaExpDir.contains("ALogica") || classeDaExpDir.contains("ARelacional")) || (classeDaExpEsq.contains("ALogica") || classeDaExpEsq.contains("ARelacional")) ) {
+					System.out.println("Uma expressão aritmética não pode ser divida diretamente com uma expressão lógica ou relacional, e vice-versa!");
+				}
+			}
+			// Caso: (2 > 1) == 1 OU 1 == (2 > 1)
+			if (classeDaExpEsq.contains("ANumeroExp") || classeDaExpDir.contains("ANumeroExp")) {
+				if ( (classeDaExpDir.contains("ALogica") || classeDaExpDir.contains("ARelacional")) || (classeDaExpEsq.contains("ALogica") || classeDaExpEsq.contains("ARelacional")) ) {
+					System.out.println("Não é possível dividir um numero com um resultado booleano usando a operação divisão!");
+				}
+			}
+			// Caso: (2 > 1) == "cara" OU "cara" == (1 > 2)
+			if ( classeDaExpEsq.contains("ACaractereExp") || classeDaExpDir.contains("ACaractereExp") ) {
+				System.out.println("Não é possível dividir um caractere com um resultado aritmético usando a operação divisão!");
+			}
+			// Caso: verdadeiro == (1 - 2) OU (2 - 1) == verdadeira
+			if ( classeDaExpEsq.contains("ABooleanoExp") || classeDaExpDir.contains("ABooleanoExp") ) {
+				System.out.println("Não é possível dividir um booleano com um resultado aritmético usando a operação divisão!");
 			}
 		}
 	}
@@ -362,11 +473,38 @@ public class Semantico extends DepthFirstAdapter {
 	public void outARelacionalMenorIgualExp(ARelacionalMenorIgualExp node) {
 		System.out.println("Key: " + node.getDireita() + " " + node.getEsquerda());
 		HashMap<String,Simbolo> tabelaDeSimbolos = pilhaTabelaSimbolos.peek();
-		if (!verificaTipagem(tabelaDeSimbolos, node.getDireita().toString().split(" ")[0], "numero")) {
-			System.out.println(node.getDireita() + " não é do tipo numero");
+		String[] expsDir = node.getDireita().toString().split(" ");
+		String[] expsEsq = node.getEsquerda().toString().split(" ");
+		String classeDaExpEsq = node.getDireita().getClass().getSimpleName().toString();
+		String classeDaExpDir = node.getEsquerda().getClass().getSimpleName().toString();
+		if (expsDir.length == 1 || expsEsq.length == 1) {
+			if ( verificaTipagem(tabelaDeSimbolos, node.getDireita().toString().split(" ")[0], "numero") ) {
+				if ( !verificaTipagem(tabelaDeSimbolos, node.getEsquerda().toString().split(" ")[0], "numero") ) {
+					System.out.println(node.getEsquerda() + " não é do tipo numero");
+				}
+			}else {
+				System.out.println("A variavel " + node.getDireita() + " não é do tipo numero");
+			}
 		}else {
-			if (!verificaTipagem(tabelaDeSimbolos, node.getEsquerda().toString().split(" ")[0], "numero")) {
-				System.out.println(node.getEsquerda() + " não é do tipo numero");
+			// Caso: (2 - 1) == (1 > 2) OU (2 > 1) == (1 - 2)
+			if ( classeDaExpEsq.contains("AAritmetica") || classeDaExpDir.contains("AAritmetica") ) {
+				if ( (classeDaExpDir.contains("ALogica") || classeDaExpDir.contains("ARelacional")) || (classeDaExpEsq.contains("ALogica") || classeDaExpEsq.contains("ARelacional")) ) {
+					System.out.println("Uma expressão aritmética não pode ser comparada diretamente com uma expressão lógica ou relacional, e vice-versa!");
+				}
+			}
+			// Caso: (2 > 1) == 1 OU 1 == (2 > 1)
+			if (classeDaExpEsq.contains("ANumeroExp") || classeDaExpDir.contains("ANumeroExp")) {
+				if ( (classeDaExpDir.contains("ALogica") || classeDaExpDir.contains("ARelacional")) || (classeDaExpEsq.contains("ALogica") || classeDaExpEsq.contains("ARelacional")) ) {
+					System.out.println("Não é possível comparar um numero com um resultado booleano usando a operação de menor ou igual!");
+				}
+			}
+			// Caso: (2 > 1) == "cara" OU "cara" == (1 > 2)
+			if ( classeDaExpEsq.contains("ACaractereExp") || classeDaExpDir.contains("ACaractereExp") ) {
+				System.out.println("Não é possível comparar um caractere com um resultado aritmético usando a operação de menor ou igual!");
+			}
+			// Caso: verdadeiro == (1 - 2) OU (2 - 1) == verdadeira
+			if ( classeDaExpEsq.contains("ABooleanoExp") || classeDaExpDir.contains("ABooleanoExp") ) {
+				System.out.println("Não é possível comparar um booleano com um resultado aritmético usando a operação de menor ou igual!");
 			}
 		}
 	}
@@ -375,11 +513,38 @@ public class Semantico extends DepthFirstAdapter {
 	public void outARelacionalMenorExp(ARelacionalMenorExp node) {
 		System.out.println("Key: " + node.getDireita() + " " + node.getEsquerda());
 		HashMap<String,Simbolo> tabelaDeSimbolos = pilhaTabelaSimbolos.peek();
-		if (!verificaTipagem(tabelaDeSimbolos, node.getDireita().toString().split(" ")[0], "numero")) {
-			System.out.println(node.getDireita() + " não é do tipo numero");
+		String[] expsDir = node.getDireita().toString().split(" ");
+		String[] expsEsq = node.getEsquerda().toString().split(" ");
+		String classeDaExpEsq = node.getDireita().getClass().getSimpleName().toString();
+		String classeDaExpDir = node.getEsquerda().getClass().getSimpleName().toString();
+		if (expsDir.length == 1 || expsEsq.length == 1) {
+			if ( verificaTipagem(tabelaDeSimbolos, node.getDireita().toString().split(" ")[0], "numero") ) {
+				if ( !verificaTipagem(tabelaDeSimbolos, node.getEsquerda().toString().split(" ")[0], "numero") ) {
+					System.out.println(node.getEsquerda() + " não é do tipo numero");
+				}
+			}else {
+				System.out.println("A variavel " + node.getDireita() + " não é do tipo numero");
+			}
 		}else {
-			if (!verificaTipagem(tabelaDeSimbolos, node.getEsquerda().toString().split(" ")[0], "numero")) {
-				System.out.println(node.getEsquerda() + " não é do tipo numero");
+			// Caso: (2 - 1) == (1 > 2) OU (2 > 1) == (1 - 2)
+			if ( classeDaExpEsq.contains("AAritmetica") || classeDaExpDir.contains("AAritmetica") ) {
+				if ( (classeDaExpDir.contains("ALogica") || classeDaExpDir.contains("ARelacional")) || (classeDaExpEsq.contains("ALogica") || classeDaExpEsq.contains("ARelacional")) ) {
+					System.out.println("Uma expressão aritmética não pode ser comparada diretamente com uma expressão lógica ou relacional, e vice-versa!");
+				}
+			}
+			// Caso: (2 > 1) == 1 OU 1 == (2 > 1)
+			if (classeDaExpEsq.contains("ANumeroExp") || classeDaExpDir.contains("ANumeroExp")) {
+				if ( (classeDaExpDir.contains("ALogica") || classeDaExpDir.contains("ARelacional")) || (classeDaExpEsq.contains("ALogica") || classeDaExpEsq.contains("ARelacional")) ) {
+					System.out.println("Não é possível comparar um numero com um resultado booleano usando a operação de menor!");
+				}
+			}
+			// Caso: (2 > 1) == "cara" OU "cara" == (1 > 2)
+			if ( classeDaExpEsq.contains("ACaractereExp") || classeDaExpDir.contains("ACaractereExp") ) {
+				System.out.println("Não é possível comparar um caractere com um resultado aritmético usando a operação de menor!");
+			}
+			// Caso: verdadeiro == (1 - 2) OU (2 - 1) == verdadeira
+			if ( classeDaExpEsq.contains("ABooleanoExp") || classeDaExpDir.contains("ABooleanoExp") ) {
+				System.out.println("Não é possível comparar um booleano com um resultado aritmético usando a operação de menor!");
 			}
 		}
 	}
@@ -388,11 +553,38 @@ public class Semantico extends DepthFirstAdapter {
 	public void outARelacionalMaiorIgualExp(ARelacionalMaiorIgualExp node) {
 		System.out.println("Key: " + node.getDireita() + " " + node.getEsquerda());
 		HashMap<String,Simbolo> tabelaDeSimbolos = pilhaTabelaSimbolos.peek();
-		if (!verificaTipagem(tabelaDeSimbolos, node.getDireita().toString().split(" ")[0], "numero")) {
-			System.out.println(node.getDireita() + " não é do tipo numero");
+		String[] expsDir = node.getDireita().toString().split(" ");
+		String[] expsEsq = node.getEsquerda().toString().split(" ");
+		String classeDaExpEsq = node.getDireita().getClass().getSimpleName().toString();
+		String classeDaExpDir = node.getEsquerda().getClass().getSimpleName().toString();
+		if (expsDir.length == 1 || expsEsq.length == 1) {
+			if ( verificaTipagem(tabelaDeSimbolos, node.getDireita().toString().split(" ")[0], "numero") ) {
+				if ( !verificaTipagem(tabelaDeSimbolos, node.getEsquerda().toString().split(" ")[0], "numero") ) {
+					System.out.println(node.getEsquerda() + " não é do tipo numero");
+				}
+			}else {
+				System.out.println("A variavel " + node.getDireita() + " não é do tipo numero");
+			}
 		}else {
-			if (!verificaTipagem(tabelaDeSimbolos, node.getEsquerda().toString().split(" ")[0], "numero")) {
-				System.out.println(node.getEsquerda() + " não é do tipo numero");
+			// Caso: (2 - 1) == (1 > 2) OU (2 > 1) == (1 - 2)
+			if ( classeDaExpEsq.contains("AAritmetica") || classeDaExpDir.contains("AAritmetica") ) {
+				if ( (classeDaExpDir.contains("ALogica") || classeDaExpDir.contains("ARelacional")) || (classeDaExpEsq.contains("ALogica") || classeDaExpEsq.contains("ARelacional")) ) {
+					System.out.println("Uma expressão aritmética não pode ser comparada diretamente com uma expressão lógica ou relacional, e vice-versa!");
+				}
+			}
+			// Caso: (2 > 1) == 1 OU 1 == (2 > 1)
+			if (classeDaExpEsq.contains("ANumeroExp") || classeDaExpDir.contains("ANumeroExp")) {
+				if ( (classeDaExpDir.contains("ALogica") || classeDaExpDir.contains("ARelacional")) || (classeDaExpEsq.contains("ALogica") || classeDaExpEsq.contains("ARelacional")) ) {
+					System.out.println("Não é possível comparar um numero com um resultado booleano usando a operação de maior ou igual!");
+				}
+			}
+			// Caso: (2 > 1) == "cara" OU "cara" == (1 > 2)
+			if ( classeDaExpEsq.contains("ACaractereExp") || classeDaExpDir.contains("ACaractereExp") ) {
+				System.out.println("Não é possível comparar um caractere com um resultado aritmético usando a operação de maior ou igual!");
+			}
+			// Caso: verdadeiro == (1 - 2) OU (2 - 1) == verdadeira
+			if ( classeDaExpEsq.contains("ABooleanoExp") || classeDaExpDir.contains("ABooleanoExp") ) {
+				System.out.println("Não é possível comparar um booleano com um resultado aritmético usando a operação de maior ou igual!");
 			}
 		}
 	}
@@ -401,68 +593,179 @@ public class Semantico extends DepthFirstAdapter {
 	public void outARelacionalMaiorExp(ARelacionalMaiorExp node) {
 		System.out.println("Key: " + node.getDireita() + " " + node.getEsquerda());
 		HashMap<String,Simbolo> tabelaDeSimbolos = pilhaTabelaSimbolos.peek();
-		if (!verificaTipagem(tabelaDeSimbolos, node.getDireita().toString().split(" ")[0], "numero")) {
-			System.out.println(node.getDireita() + " não é do tipo numero");
+		String[] expsDir = node.getDireita().toString().split(" ");
+		String[] expsEsq = node.getEsquerda().toString().split(" ");
+		String classeDaExpEsq = node.getDireita().getClass().getSimpleName().toString();
+		String classeDaExpDir = node.getEsquerda().getClass().getSimpleName().toString();
+		if (expsDir.length == 1 || expsEsq.length == 1) {
+			if ( verificaTipagem(tabelaDeSimbolos, node.getDireita().toString().split(" ")[0], "numero") ) {
+				if ( !verificaTipagem(tabelaDeSimbolos, node.getEsquerda().toString().split(" ")[0], "numero") ) {
+					System.out.println(node.getEsquerda() + " não é do tipo numero");
+				}
+			}else {
+				System.out.println("A variavel " + node.getDireita() + " não é do tipo numero");
+			}
 		}else {
-			if (!verificaTipagem(tabelaDeSimbolos, node.getEsquerda().toString().split(" ")[0], "numero")) {
-				System.out.println(node.getEsquerda() + " não é do tipo numero");
+			// Caso: (2 - 1) == (1 > 2) OU (2 > 1) == (1 - 2)
+			if ( classeDaExpEsq.contains("AAritmetica") || classeDaExpDir.contains("AAritmetica") ) {
+				if ( (classeDaExpDir.contains("ALogica") || classeDaExpDir.contains("ARelacional")) || (classeDaExpEsq.contains("ALogica") || classeDaExpEsq.contains("ARelacional")) ) {
+					System.out.println("Uma expressão aritmética não pode ser comparada diretamente com uma expressão lógica ou relacional, e vice-versa!");
+				}
+			}
+			// Caso: (2 > 1) == 1 OU 1 == (2 > 1)
+			if (classeDaExpEsq.contains("ANumeroExp") || classeDaExpDir.contains("ANumeroExp")) {
+				if ( (classeDaExpDir.contains("ALogica") || classeDaExpDir.contains("ARelacional")) || (classeDaExpEsq.contains("ALogica") || classeDaExpEsq.contains("ARelacional")) ) {
+					System.out.println("Não é possível comparar um numero com um resultado booleano usando a operação de maior!");
+				}
+			}
+			// Caso: (2 > 1) == "cara" OU "cara" == (1 > 2)
+			if ( classeDaExpEsq.contains("ACaractereExp") || classeDaExpDir.contains("ACaractereExp") ) {
+				System.out.println("Não é possível comparar um caractere com um resultado aritmético usando a operação de maior!");
+			}
+			// Caso: verdadeiro == (1 - 2) OU (2 - 1) == verdadeira
+			if ( classeDaExpEsq.contains("ABooleanoExp") || classeDaExpDir.contains("ABooleanoExp") ) {
+				System.out.println("Não é possível comparar um booleano com um resultado aritmético usando a operação de maior!");
 			}
 		}
 	}
 	
 	@Override
-	public void inARelacionalIgualExp(ARelacionalIgualExp node) {
+	public void outARelacionalIgualExp(ARelacionalIgualExp node) {
 		HashMap<String,Simbolo> tabelaDeSimbolos = pilhaTabelaSimbolos.peek();
-		String exp = node.getDireita().toString().split(" ")[0];
-		if (isNumero(exp)) {
-			if (!verificaTipagem(tabelaDeSimbolos, node.getDireita().toString().split(" ")[0], "numero")) {
-				System.out.println(node.getDireita() + " não é do tipo numero");
-			}else {
-				if (!verificaTipagem(tabelaDeSimbolos, node.getEsquerda().toString().split(" ")[0], "numero")) {
+		String[] expsDir = node.getDireita().toString().split(" ");
+		String[] expsEsq = node.getEsquerda().toString().split(" ");
+		String classeDaExpEsq = node.getDireita().getClass().getSimpleName().toString();
+		String classeDaExpDir = node.getEsquerda().getClass().getSimpleName().toString();
+		if (expsDir.length == 1 || expsEsq.length == 1) {
+			if ( verificaTipagem(tabelaDeSimbolos, node.getDireita().toString().split(" ")[0], "numero") ) {
+				if ( !verificaTipagem(tabelaDeSimbolos, node.getEsquerda().toString().split(" ")[0], "numero") ) {
 					System.out.println(node.getEsquerda() + " não é do tipo numero");
+				}
+			}else {
+				if ( verificaTipagem(tabelaDeSimbolos, node.getDireita().toString().split(" ")[0], "caractere")) {
+					if ( !verificaTipagem(tabelaDeSimbolos, node.getEsquerda().toString().split(" ")[0], "caractere")) {
+						System.out.println(node.getEsquerda() + " não é do tipo caractere");
+					}
+				}else {
+					System.out.println("A variavel " + node.getDireita() + " não é do tipo caractere");
 				}
 			}
 		}else {
-			if (!verificaTipagem(tabelaDeSimbolos, node.getDireita().toString().split(" ")[0], "caractere")) {
-				System.out.println(node.getDireita() + " não é do tipo numero");
-			}else {
-				if (!verificaTipagem(tabelaDeSimbolos, node.getEsquerda().toString().split(" ")[0], "caractere")) {
-					System.out.println(node.getEsquerda() + " não é do tipo numero");
+			// Caso: (2 - 1) == (1 > 2) OU (2 > 1) == (1 - 2)
+			if ( classeDaExpEsq.contains("AAritmetica") || classeDaExpDir.contains("AAritmetica") ) {
+				if ( (classeDaExpDir.contains("ALogica") || classeDaExpDir.contains("ARelacional")) || (classeDaExpEsq.contains("ALogica") || classeDaExpEsq.contains("ARelacional")) ) {
+					System.out.println("Se a expressão é aritmetica, logo não pode ser igualar uma expressão logica ou relacional, vice-versa! ");
+				}
+			}
+			// Caso: (2 > 1) == 1 OU 1 == (2 > 1)
+			if (classeDaExpEsq.contains("ANumeroExp") || classeDaExpDir.contains("ANumeroExp")) {
+				if ( (classeDaExpDir.contains("ALogica") || classeDaExpDir.contains("ARelacional")) || (classeDaExpEsq.contains("ALogica") || classeDaExpEsq.contains("ARelacional")) ) {
+					System.out.println("Não pode igualar um numero com o um resultado booleano");
+				}
+			}
+			// Caso: (2 > 1) == "cara" OU "cara" == (1 > 2)
+			if ( classeDaExpEsq.contains("ACaractereExp") || classeDaExpDir.contains("ACaractereExp") ) {
+				if ( !classeDaExpEsq.contains("AAritmeticaSomaExp") || !classeDaExpDir.contains("AAritmeticaSomaExp") ) {
+					System.out.println("Não pode igualar um caractere com o um resultado booleano");
+				}
+			}
+			// Caso: verdadeiro == (1 - 2) OU (2 - 1) == verdadeira
+			if ( classeDaExpEsq.contains("ABooleanoExp") || classeDaExpDir.contains("ABooleanoExp") ) {
+				if ( classeDaExpEsq.contains("AAritmetica") || classeDaExpDir.contains("AAritmetica") ) {
+					System.out.println("Não pode igualar um booleano com resultado aritmetico");
 				}
 			}
 		}
 	}
 	
 	@Override
-	// Imcompleta
-	public void inALogicaNaoExp(ALogicaNaoExp node) {
+	public void outALogicaNaoExp(ALogicaNaoExp node) {
 		HashMap<String,Simbolo> tabelaDeSimbolos = pilhaTabelaSimbolos.peek();
 		String[] exps = node.getExp().toString().split(" ");
 		if (exps.length == 1) {
-			if ( !exps.equals("verdadeiro")) {
-				System.out.println("A expressão não é booleana");
+			if ( verificaTipagem(tabelaDeSimbolos, exps[0], "booleano") ) {
 			}else {
-				if( !exps.equals("falso")) {
-					System.out.println("A expressão não é booleana");
-				}
+				System.out.println("A expressão não é booleana");
 			}
 		}else {
 			if (exps.length > 1) {
-				String classeDaExp = node.getClass().getSimpleName().toString();
-				if (classeDaExp.contains("ALogica") || classeDaExp.contains("ARelacional")) {
-					if (exps.length <= 2) {
-						for (String exp : exps) {
-							if (!exp.equals("verdadeiro") || !exp.equals("falso")) {
-								System.out.print("A expressao não é booleana");
-							}
-						}
-					}else {
-						for (String exp : exps) {
-							if (!exp.equals("verdadeiro") || !exp.equals("falso")) {
-								System.out.print("A expressao não é booleana");
-							}
-						}
-					}
+				String classeDaExp = node.getExp().getClass().getSimpleName().toString();
+				if (classeDaExp.contains("AAritmetico")) {
+					System.out.println("Não é possivel transformar uma expressão aritmetica em booleana");
+				}
+			}
+		}
+	}
+	
+	@Override
+	public void outALogicaOuExp(ALogicaOuExp node) {
+		HashMap<String,Simbolo> tabelaDeSimbolos = pilhaTabelaSimbolos.peek();
+		String[] expsDir = node.getDireita().toString().split(" ");
+		String[] expsEsq = node.getEsquerda().toString().split(" ");
+		String classeDaExpEsq = node.getDireita().getClass().getSimpleName().toString();
+		String classeDaExpDir = node.getEsquerda().getClass().getSimpleName().toString();
+		if (expsDir.length == 1 || expsEsq.length == 1) {
+			if ( verificaTipagem(tabelaDeSimbolos, node.getDireita().toString().split(" ")[0], "booleano")) {
+				if (!verificaTipagem(tabelaDeSimbolos, node.getEsquerda().toString().split(" ")[0], "booleano")) {
+					System.out.println(node.getEsquerda() + " não é do tipo booleano");
+				}
+			}else {
+				System.out.println("A variavel " + node.getDireita() + " não é do tipo booleano");
+			}
+		}else {
+			// Caso: (2 - 1) == (1 > 2) OU (2 > 1) == (1 - 2)
+			if ( classeDaExpEsq.contains("AAritmetica") || classeDaExpDir.contains("AAritmetica") ) {
+				System.out.println("Não é possível realizar essa operação, pois ela contém uma expressão aritmética incompatível com a expressão logica! ");
+			}
+			// Caso: (2 > 1) == 1 OU 1 == (2 > 1)
+			if (classeDaExpEsq.contains("ANumeroExp") || classeDaExpDir.contains("ANumeroExp")) {
+					System.out.println("Não pode usar a operação 'ou' em um numero com o resultado booleano!");
+			}
+			// Caso: (2 > 1) == "cara" OU "cara" == (1 > 2)
+			if ( classeDaExpEsq.contains("ACaractereExp") || classeDaExpDir.contains("ACaractereExp") ) {
+					System.out.println("Não pode usar a operação 'ou' em um caractere com o resultado booleano!");
+			}
+			// Caso: verdadeiro == (1 - 2) OU (2 - 1) == verdadeira
+			if ( classeDaExpEsq.contains("ABooleanoExp") || classeDaExpDir.contains("ABooleanoExp") ) {
+				if ( !(classeDaExpDir.contains("ALogica") || classeDaExpDir.contains("ARelacional")) || !(classeDaExpEsq.contains("ALogica") || classeDaExpEsq.contains("ARelacional")) ) {
+					System.out.println("Não pode usar a operação 'ou' em um booleano com uma expressão aritmetica!");
+				}
+			}
+		}
+	}
+	
+	@Override
+	public void outALogicaEExp(ALogicaEExp node) {
+		HashMap<String,Simbolo> tabelaDeSimbolos = pilhaTabelaSimbolos.peek();
+		String[] expsDir = node.getDireita().toString().split(" ");
+		String[] expsEsq = node.getEsquerda().toString().split(" ");
+		String classeDaExpEsq = node.getDireita().getClass().getSimpleName().toString();
+		String classeDaExpDir = node.getEsquerda().getClass().getSimpleName().toString();
+		if (expsDir.length == 1 || expsEsq.length == 1) {
+			if ( verificaTipagem(tabelaDeSimbolos, node.getDireita().toString().split(" ")[0], "booleano")) {
+				if (!verificaTipagem(tabelaDeSimbolos, node.getEsquerda().toString().split(" ")[0], "booleano")) {
+					System.out.println(node.getEsquerda() + " não é do tipo booleano");
+				}
+			}else {
+				System.out.println("A variavel " + node.getDireita() + " não é do tipo booleano");
+			}
+		}else {
+			// Caso: (2 - 1) == (1 > 2) OU (2 > 1) == (1 - 2)
+			if ( classeDaExpEsq.contains("AAritmetica") || classeDaExpDir.contains("AAritmetica") ) {
+				System.out.println("Não é possível realizar essa operação, pois ela contém uma expressão aritmética incompatível com a expressão logica! ");
+			}
+			// Caso: (2 > 1) == 1 OU 1 == (2 > 1)
+			if (classeDaExpEsq.contains("ANumeroExp") || classeDaExpDir.contains("ANumeroExp")) {
+					System.out.println("Não pode usar a operação 'e' em um numero com o resultado booleano!");
+			}
+			// Caso: (2 > 1) == "cara" OU "cara" == (1 > 2)
+			if ( classeDaExpEsq.contains("ACaractereExp") || classeDaExpDir.contains("ACaractereExp") ) {
+					System.out.println("Não pode usar a operação 'e' em um caractere com o resultado booleano!");
+			}
+			// Caso: verdadeiro == (1 - 2) OU (2 - 1) == verdadeira
+			if ( classeDaExpEsq.contains("ABooleanoExp") || classeDaExpDir.contains("ABooleanoExp") ) {
+				if ( !(classeDaExpDir.contains("ALogica") || classeDaExpDir.contains("ARelacional")) || !(classeDaExpEsq.contains("ALogica") || classeDaExpEsq.contains("ARelacional")) ) {
+					System.out.println("Não pode usar a operação 'e' em um booleano com uma expressão aritmetica!");
 				}
 			}
 		}
